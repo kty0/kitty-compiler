@@ -1,1 +1,4 @@
-FIXME: Who are you?
+Apoorvaa Thevarajah           <apoorvaa.thevarajah@epita.fr>
+Dao-Phuong-Thao Cathy Nguyen  <dao-phuong-thaocathy.nguyen@epita.fr>
+Emmanuel Vouillon             <emmanuel.vouillon@epita.fr>
+Julie Ducastel                <julie.ducastel@epita.fr>

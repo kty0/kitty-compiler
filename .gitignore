@@ -1,0 +1,9 @@
+.idea/
+autom4te.cache/
+build-aux/
+build/
+
+configure
+
+*.m4
+*.in

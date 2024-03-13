@@ -1,4 +1,4 @@
-                                                                // -*- C++ -*-
+// -*- C++ -*-
 %require "3.8"
 %language "c++"
 // Set the namespace name to `parse', instead of `yy'.
@@ -17,6 +17,8 @@
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
   // FIXME: Some code was deleted here (Other directives).
+%expect 0
+%expect-rr 0
 
 %define parse.error verbose
 %defines
@@ -177,10 +179,88 @@ program:
    
 ;
 
-exp:
-  INT
-   
   // FIXME: Some code was deleted here (More rules).
+
+exps:
+    %empty
+    | exp sub_exps
+
+sub_exps:
+    %empty
+    | ";" exp
+
+exp:
+  /* Literals */
+   NIL
+  | INT
+  | STRING
+
+  /* Array and record creations */
+  | typeid "[" exp "]" "of" exp
+  | typeid "{" empty_type "}"
+   
+  /* Variables, field, elements of an array */
+  | lvalue
+
+  /* Function call */
+  | ID "(" extra_exp_1 ")"
+
+  /* Operations*/
+  | "-" exp
+  /* Operations with op */
+  | exp "+" exp
+  | exp "-" exp
+  | exp "*" exp
+  | exp "/" exp
+  | exp "=" exp
+  | exp "<>" exp
+  | exp ">" exp
+  | "(" exps ")"
+
+  /* Assignment */
+  | lvalue ":=" exp
+
+  /* Control structures */
+  | "if" exp "then" exp else_rule
+  | "while" exp "do" exp
+  | "for" ID ":=" exp "to" exp "do" exp
+  | "break"
+  | "let" chunks "in" exps "end"
+  ;
+
+empty_type:
+    %empty
+    | ID "=" exp empty_type_2
+    ;
+
+empty_type_2:
+    %empty
+    | "," ID "=" exp empty_type_2
+    ;
+
+extra_exp_1:
+    %empty
+    | exp extra_exp_2
+    ;
+
+extra_exp_2:
+    %empty
+    | "," exp
+    ;
+
+else_rule:
+    %empty
+    | "else" exp
+    ;
+
+
+lvalue:
+    ID
+    /* record field access */
+    | lvalue "." ID
+    /* array sub */
+    | lvalue "[" exp "]"
+    ;
 
 /*---------------.
 | Declarations.  |
@@ -200,6 +280,8 @@ chunks:
   %empty                  
 | tychunk   chunks        
   // FIXME: Some code was deleted here (More rules).
+| funchunk chunks
+| varchunk
 ;
 
 /*--------------------.
@@ -211,6 +293,27 @@ tychunk:
      shift-reduce conflict. */
   tydec %prec CHUNKS  
 | tydec tychunk       
+;
+
+funchunk:
+  /* Use `%prec CHUNKS' to do context-dependent precedence and resolve a
+     shift-reduce conflict. */
+  fundec %prec CHUNKS
+| fundec funchunk
+;
+
+fundec:
+    "function" ID "(" tyfields ")" fundecbis "=" exp
+| "primitive" ID "(" tyfields ")" fundecbis
+;
+
+fundecbis:
+    %empty
+    | ":" ID
+    ;
+
+varchunk:
+    "var" ID fundecbis ":=" exp
 ;
 
 tydec:

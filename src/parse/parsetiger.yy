@@ -156,6 +156,14 @@
 
 
   // FIXME: Some code was deleted here (Priorities/associativities).
+%precedence "for" "while"
+%precedence "then"
+%precedence "else"
+%precedence "do" "to" "of"
+%precedence ":="
+%left "<>" "=" ">"
+%left "+" "-"
+%left "*" "/"
 
 // Solving conflicts on:
 // let type foo = bar
@@ -165,7 +173,8 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
-  // FIXME: Some code was deleted here (Other declarations).
+// FIXME: Some code was deleted here (Other declarations).
+%precedence UNARY
 
 %start program
 
@@ -206,7 +215,7 @@ exp:
   | ID "(" extra_exp_1 ")"
 
   /* Operations*/
-  | "-" exp
+  | "-" exp %prec UNARY
   /* Operations with op */
   | exp "+" exp
   | exp "-" exp
@@ -337,7 +346,7 @@ tyfields.1:
 ;
 
 tyfield:
-  ID ":" typeid     
+  ID ":" ID
 ;
 
 %token NAMETY "_namety";

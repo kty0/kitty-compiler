@@ -17,7 +17,7 @@
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
   // FIXME: Some code was deleted here (Other directives).
-%expect 0
+%expect 1
 %expect-rr 0
 
 %define parse.error verbose
@@ -155,7 +155,7 @@
        EOF 0        "end of file"
 
 
-  // FIXME: Some code was deleted here (Priorities/associativities).
+  // FIXED: Some code was deleted here (Priorities/associativities).
 %precedence "for" "while"
 %precedence "then"
 %precedence "else"
@@ -173,7 +173,7 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
-// FIXME: Some code was deleted here (Other declarations).
+// FIXED: Some code was deleted here (Other declarations).
 %precedence UNARY
 
 %start program
@@ -188,7 +188,7 @@ program:
    
 ;
 
-  // FIXME: Some code was deleted here (More rules).
+  // FIXED: Some code was deleted here (More rules).
 
 exps:
     %empty
@@ -205,8 +205,8 @@ exp:
   | STRING
 
   /* Array and record creations */
-  | typeid "[" exp "]" "of" exp
-  | typeid "{" empty_type "}"
+  | ID "[" exp "]" "of" exp
+  | ID "{" empty_type "}"
    
   /* Variables, field, elements of an array */
   | lvalue
@@ -230,7 +230,8 @@ exp:
   | lvalue ":=" exp
 
   /* Control structures */
-  | "if" exp "then" exp else_rule
+  | "if" exp "then" exp
+  | "if" exp "then" exp "else" exp
   | "while" exp "do" exp
   | "for" ID ":=" exp "to" exp "do" exp
   | "break"
@@ -255,11 +256,6 @@ extra_exp_1:
 extra_exp_2:
     %empty
     | "," exp
-    ;
-
-else_rule:
-    %empty
-    | "else" exp
     ;
 
 
@@ -288,7 +284,7 @@ chunks:
      which is why we end the recursion with a %empty. */
   %empty                  
 | tychunk   chunks        
-  // FIXME: Some code was deleted here (More rules).
+  // FIXED: Some code was deleted here (More rules).
 | funchunk chunks
 | varchunk
 ;
@@ -305,9 +301,7 @@ tychunk:
 ;
 
 funchunk:
-  /* Use `%prec CHUNKS' to do context-dependent precedence and resolve a
-     shift-reduce conflict. */
-  fundec %prec CHUNKS
+  fundec CHUNKS
 | fundec funchunk
 ;
 
@@ -330,9 +324,9 @@ tydec:
 ;
 
 ty:
-  typeid               
+  ID
 | "{" tyfields "}"     
-| "array" "of" typeid  
+| "array" "of" ID
 ;
 
 tyfields:
@@ -349,13 +343,13 @@ tyfield:
   ID ":" ID
 ;
 
-%token NAMETY "_namety";
+/*%token NAMETY "_namety";
 typeid:
-  ID                    
+  ID
   /* This is a metavariable. It it used internally by TWEASTs to retrieve
      already parsed nodes when given an input to parse. */
-| NAMETY "(" INT ")"    
-;
+| NAMETY "(" INT ")"
+;*/
 
 %%
 

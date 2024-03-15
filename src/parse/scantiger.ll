@@ -37,7 +37,8 @@
 #include <parse/parsetiger.hh>
 #include <parse/tiger-driver.hh>
 
-  // FIXME: Some code was deleted here (Define YY_USER_ACTION to update locations).
+  // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
+#define YY_USER_ACTION loc.columns(yyleng);
 
 #define TOKEN(Type)                             \
   parser::make_ ## Type(td.location_)

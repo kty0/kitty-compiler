@@ -16,7 +16,7 @@
 
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
-  // FIXME: Some code was deleted here (Other directives).
+  // FIXED: Some code was deleted here (Other directives).
 %expect 1
 %expect-rr 0
 
@@ -156,10 +156,9 @@
 
 
   // FIXED: Some code was deleted here (Priorities/associativities).
-%precedence "for" "while"
 %precedence "then"
 %precedence "else"
-%precedence "do" "to" "of"
+%precedence "do" "of"
 %precedence ":="
 %left "<>" "=" ">"
 %left "+" "-"
@@ -323,14 +322,17 @@ tydec:
   "type" ID "=" ty 
 ;
 
+%token NAMETY "_namety";
+
 ty:
   ID
 | "{" tyfields "}"     
 | "array" "of" ID
+| "array" "of" NAMETY "(" INT ")"
 ;
 
 tyfields:
-  %empty               
+        %empty               
 | tyfields.1           
 ;
 
@@ -340,21 +342,24 @@ tyfields.1:
 ;
 
 tyfield:
-  ID ":" ID
+       ID ":" ID
+| ID ":" NAMETY "(" INT ")"
 ;
 
-/*%token NAMETY "_namety";
+/*
 typeid:
-  ID
-  /* This is a metavariable. It it used internally by TWEASTs to retrieve
-     already parsed nodes when given an input to parse. */
+      ID
+  COMMENT This is a metavariable. It it used internally by TWEASTs to retrieve
+     already parsed nodes when given an input to parse.
 | NAMETY "(" INT ")"
-;*/
+;
+*/
 
 %%
 
 void
 parse::parser::error(const location_type& l, const std::string& m)
-{
-  // FIXME: Some code was deleted here.
+     {
+  // FIXED: Some code was deleted here.
+    std::cerr << m << " at " << l;
 }

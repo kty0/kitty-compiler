@@ -1,4 +1,4 @@
-                                                                // -*- C++ -*-
+// -*- C++ -*-
 %require "3.8"
 %language "c++"
 // Set the namespace name to `parse', instead of `yy'.
@@ -16,7 +16,9 @@
 
 // In TC, we expect the GLR to resolve one Shift-Reduce and zero Reduce-Reduce
 // conflict at runtime. Use %expect and %expect-rr to tell Bison about it.
-  // FIXME: Some code was deleted here (Other directives).
+  // FIXED: Some code was deleted here (Other directives).
+%expect 1
+%expect-rr 0
 
 %define parse.error verbose
 %defines
@@ -153,7 +155,14 @@
        EOF 0        "end of file"
 
 
-  // FIXME: Some code was deleted here (Priorities/associativities).
+  // FIXED: Some code was deleted here (Priorities/associativities).
+%precedence "then"
+%precedence "else"
+%precedence "do" "of"
+%precedence ":="
+%left "<>" "=" ">"
+%left "+" "-"
+%left "*" "/"
 
 // Solving conflicts on:
 // let type foo = bar
@@ -163,7 +172,8 @@
 // We want the latter.
 %precedence CHUNKS
 %precedence TYPE
-  // FIXME: Some code was deleted here (Other declarations).
+// FIXED: Some code was deleted here (Other declarations).
+%precedence UNARY
 
 %start program
 
@@ -177,10 +187,84 @@ program:
    
 ;
 
+  // FIXED: Some code was deleted here (More rules).
+
+exps:
+    %empty
+    | exp sub_exps
+
+sub_exps:
+    %empty
+    | ";" exp
+
 exp:
-  INT
+  /* Literals */
+   NIL
+  | INT
+  | STRING
+
+  /* Array and record creations */
+  | ID "[" exp "]" "of" exp
+  | ID "{" empty_type "}"
    
-  // FIXME: Some code was deleted here (More rules).
+  /* Variables, field, elements of an array */
+  | lvalue
+
+  /* Function call */
+  | ID "(" extra_exp_1 ")"
+
+  /* Operations*/
+  | "-" exp %prec UNARY
+  /* Operations with op */
+  | exp "+" exp
+  | exp "-" exp
+  | exp "*" exp
+  | exp "/" exp
+  | exp "=" exp
+  | exp "<>" exp
+  | exp ">" exp
+  | "(" exps ")"
+
+  /* Assignment */
+  | lvalue ":=" exp
+
+  /* Control structures */
+  | "if" exp "then" exp
+  | "if" exp "then" exp "else" exp
+  | "while" exp "do" exp
+  | "for" ID ":=" exp "to" exp "do" exp
+  | "break"
+  | "let" chunks "in" exps "end"
+  ;
+
+empty_type:
+    %empty
+    | ID "=" exp empty_type_2
+    ;
+
+empty_type_2:
+    %empty
+    | "," ID "=" exp empty_type_2
+    ;
+
+extra_exp_1:
+    %empty
+    | exp extra_exp_2
+    ;
+
+extra_exp_2:
+    %empty
+    | "," exp
+    ;
+
+
+lvalue:
+    ID
+    /* record field access */
+    | lvalue "." ID
+    /* array sub */
+    | lvalue "[" exp "]"
+    ;
 
 /*---------------.
 | Declarations.  |
@@ -199,7 +283,9 @@ chunks:
      which is why we end the recursion with a %empty. */
   %empty                  
 | tychunk   chunks        
-  // FIXME: Some code was deleted here (More rules).
+  // FIXED: Some code was deleted here (More rules).
+| funchunk chunks
+| varchunk
 ;
 
 /*--------------------.
@@ -213,18 +299,40 @@ tychunk:
 | tydec tychunk       
 ;
 
+funchunk:
+  fundec CHUNKS
+| fundec funchunk
+;
+
+fundec:
+    "function" ID "(" tyfields ")" fundecbis "=" exp
+| "primitive" ID "(" tyfields ")" fundecbis
+;
+
+fundecbis:
+    %empty
+    | ":" ID
+    ;
+
+varchunk:
+    "var" ID fundecbis ":=" exp
+;
+
 tydec:
   "type" ID "=" ty 
 ;
 
+%token NAMETY "_namety";
+
 ty:
-  typeid               
+  ID
 | "{" tyfields "}"     
-| "array" "of" typeid  
+| "array" "of" ID
+| "array" "of" NAMETY "(" INT ")"
 ;
 
 tyfields:
-  %empty               
+        %empty               
 | tyfields.1           
 ;
 
@@ -234,21 +342,24 @@ tyfields.1:
 ;
 
 tyfield:
-  ID ":" typeid     
+       ID ":" ID
+| ID ":" NAMETY "(" INT ")"
 ;
 
-%token NAMETY "_namety";
+/*
 typeid:
-  ID                    
-  /* This is a metavariable. It it used internally by TWEASTs to retrieve
-     already parsed nodes when given an input to parse. */
-| NAMETY "(" INT ")"    
+      ID
+  COMMENT This is a metavariable. It it used internally by TWEASTs to retrieve
+     already parsed nodes when given an input to parse.
+| NAMETY "(" INT ")"
 ;
+*/
 
 %%
 
 void
 parse::parser::error(const location_type& l, const std::string& m)
-{
-  // FIXME: Some code was deleted here.
+     {
+  // FIXED: Some code was deleted here.
+    std::cerr << m << " at " << l;
 }

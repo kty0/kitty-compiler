@@ -29,7 +29,7 @@ AM_BISONFLAGS =                                                                \
   --report=all
 
 ## Use this additional bison flag to display counterexamples in the tty.
-#AM_BISONFLAGS += --warnings=counterexamples
+AM_BISONFLAGS += --warnings=counterexamples
 
 # We do not use Automake features here.
 SOURCES_PARSETIGER_YY =                                                        \

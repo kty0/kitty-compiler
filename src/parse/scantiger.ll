@@ -46,7 +46,7 @@
 #define TOKEN_VAL(Type, Value)                  \
     parser::make_ ## Type(Value, td.location_)
 
-# define CHECK_EXTENSION()                              \
+#define CHECK_EXTENSION()                              \
     do {                                                  \
         if (!td.enable_extensions_p_)                       \
         td.error_ << misc::error::error_type::scan        \
@@ -54,6 +54,10 @@
         << ": invalid identifier: `"            \
         << misc::escape(text()) << "'\n";       \
     } while (false)
+
+#define ERROR() td.error_ << misc::error::error_type::scan        \
+        << td.location_                         \
+        << ": error D:\n"
 
 %}
 
@@ -134,7 +138,7 @@ id              [a-z][a-z0-9]*
 
 {space}     {}
 
-.           { std::cerr << "unexpected " << text(); } /* everything else is garbage */
+.           { std::cerr << "unexpected oh no" << text(); ERROR(); } /* everything else is garbage */
 
 <SC_COMMENT> {
 "*/" {
@@ -147,7 +151,7 @@ id              [a-z][a-z0-9]*
 
 "/*"        { nested++; }
 
-<<EOF>> { std::cerr << "expected */ got EOF\n"; start(INITIAL); }
+<<EOF>> { std::cerr << "expected */ got EOF\n"; ERROR(); start(INITIAL); }
 
 .   {}
 }
@@ -159,7 +163,14 @@ id              [a-z][a-z0-9]*
     }
 
 \\x[0-9a-fA-F]{2}  { grown_string += strtol(text() + 2, 0, 16); }
+
+<<EOF>> { std::cerr << "expected \" got EOF\n"; ERROR(); start(INITIAL); }
+
+. { std::cout << "appending " << text() << "\n"; grown_string += text(); }
 }
+
+<<EOF>> { return TOKEN(EOF); }
+
 %%
 
 

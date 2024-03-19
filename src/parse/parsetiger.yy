@@ -357,9 +357,16 @@ typeid:
 
 %%
 
-void
-parse::parser::error(const location_type& l, const std::string& m)
-     {
+void parse::parser::error(const location_type& l, const std::string& m)
+{
   // FIXED: Some code was deleted here.
-    std::cerr << m << " at " << l << "\n";
+  /*
+   * This function is called automatically when an error occurs.
+   * - l is the location object of tiger driver which contains the location of
+   *    the error in the file
+   * - m is the automatically generated error message
+   *
+   * error_ from tiger driver is used as a stream to handle errors
+   */
+  td.error_ << misc::error::error_type::parse << l << ": " << m << "\n";
 }

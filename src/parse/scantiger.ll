@@ -38,7 +38,8 @@
 #include <parse/tiger-driver.hh>
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
-#define YY_USER_ACTION td.location_.columns(yyleng);
+#define YY_USER_ACTION              \
+  td.location_.columns(yyleng);
 
 #define TOKEN(Type)                             \
     parser::make_ ## Type(td.location_)
@@ -55,9 +56,10 @@
         << misc::escape(text()) << "'\n";       \
     } while (false)
 
-#define ERROR() td.error_ << misc::error::error_type::scan        \
-        << td.location_                         \
-        << ": error D:\n"
+#define ERROR(m)                                \
+  td.error_ << misc::error::error_type::scan    \
+  << td.location_                               \
+  << ": lexical error, " << m << "\n"          \
 
 %}
 
@@ -138,7 +140,7 @@ id              [a-z][a-z0-9]*
 
 {space}     {}
 
-.           { std::cerr << "unexpected oh no" << text(); ERROR(); } /* everything else is garbage */
+.           { ERROR("unexpected " << text()); } /* everything else is garbage */
 
 <SC_COMMENT> {
 "*/" {
@@ -151,7 +153,7 @@ id              [a-z][a-z0-9]*
 
 "/*"        { nested++; }
 
-<<EOF>> { std::cerr << "expected */ got EOF\n"; ERROR(); start(INITIAL); }
+<<EOF>> { ERROR("expected */ got EOF"); start(INITIAL); }
 
 .   {}
 }
@@ -164,9 +166,9 @@ id              [a-z][a-z0-9]*
 
 \\x[0-9a-fA-F]{2}  { grown_string += strtol(text() + 2, 0, 16); }
 
-<<EOF>> { std::cerr << "expected \" got EOF\n"; ERROR(); start(INITIAL); }
+<<EOF>> { ERROR("expected \" got EOF"); start(INITIAL); }
 
-. { std::cout << "appending " << text() << "\n"; grown_string += text(); }
+. { grown_string += text(); }
 }
 
 <<EOF>> { return TOKEN(EOF); }

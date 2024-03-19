@@ -26,12 +26,12 @@
 #include <boost/lexical_cast.hpp>
 
 #include <misc/contract.hh>
-    // Using misc::escape is very useful to quote non printable characters.
-    // For instance
-    //
-    //    std::cerr << misc::escape('\n') << '\n';
-    //
-    // reports about `\n' instead of an actual new-line character.
+  // Using misc::escape is very useful to quote non printable characters.
+  // For instance
+  //
+  //    std::cerr << misc::escape('\n') << '\n';
+  //
+  // reports about `\n' instead of an actual new-line character.
 #include <misc/escape.hh>
 #include <misc/symbol.hh>
 #include <parse/parsetiger.hh>

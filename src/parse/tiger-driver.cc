@@ -88,12 +88,12 @@ namespace parse
       }
 
     // FIXED: Some code was deleted here (Initialize Lexer and enable scan traces).
-    scan_trace(true);
     Lexer lex(*in);
+    lex.set_debug(scan_trace_p_);
 
     // FIXED: Some code was deleted here (Initialize the parser and enable parse traces).
-    parse_trace(true);
     parser parser(*this, lex);
+    parser.set_debug_level(parse_trace_p_);
 
     // FIXED: Some code was deleted here (Run the parser).
     parser.parse();

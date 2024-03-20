@@ -37,7 +37,9 @@ namespace parse::tasks
     if (!result.first)
       task_error().exit();
 
-    // FIXME: Some code was deleted here (Set `the_program' to the result of parsing).
+    // FIXED: Some code was deleted here (Set `the_program' to the result of parsing).
+    std::unique_ptr<ast::ChunkList> r(result.first);
+    ast::tasks::the_program = std::move(r);
   }
 
   void library_display() { std::cout << l << '\n'; }

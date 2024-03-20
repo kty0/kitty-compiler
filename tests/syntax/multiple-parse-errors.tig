@@ -1,0 +1,6 @@
+(
+  1;
+  (2, 3); // error here, unexpected ","
+  (4, 5); // error here
+  6
+)

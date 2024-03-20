@@ -218,6 +218,8 @@
 %start program
 
 %%
+%token LVALUE  "_lvalue";
+%token EXP  "_exp";
 program:
   /* Parsing a source program.  */
   exp { td.ast_ = $1; }
@@ -233,8 +235,10 @@ exps:
 
 sub_exps:
     %empty
-    | ";" exp
+    | ";" exp sub_exps
 
+%token EXP "_exp";
+%token CAST "_cast";
 exp:
   /* Literals */
    NIL
@@ -244,8 +248,9 @@ exp:
 
   /* Array and record creations */
   | ID "[" exp "]" "of" exp
-  | ID "{" empty_type "}"
-   
+  // add NAMETY "(" INT ")" exp.... if need
+  | typeid "{" empty_type "}"
+
   /* Variables, field, elements of an array */
   | lvalue
 
@@ -274,6 +279,11 @@ exp:
   | "for" ID ":=" exp "to" exp "do" exp
   | "break"
   | "let" chunks "in" exps "end"
+
+  /* cast of an expression to a given type*/
+  | CAST "(" exp "," ty ")" // reserved_id ?
+  /* an expression metavariable */
+  | EXP "(" INT ")"
   ;
 
 empty_type:
@@ -296,13 +306,15 @@ extra_exp_2:
     | "," exp
     ;
 
-
+%token LVALUE "_lvalue";
 lvalue:
     ID
     /* record field access */
     | lvalue "." ID
     /* array sub */
     | lvalue "[" exp "]"
+    /* a l-value metavariable */
+    | LVALUE "(" INT ")"
     ;
 
 /*---------------.
@@ -325,6 +337,8 @@ chunks:
   // FIXED: Some code was deleted here (More rules).
 | funchunk chunks
 | varchunk
+| "import" STRING
+| CHUNKS "(" INT ")" chunks
 ;
 
 /*--------------------.
@@ -350,7 +364,7 @@ fundec:
 
 fundecbis:
     %empty
-    | ":" ID
+    | ":" typeid
     ;
 
 varchunk:
@@ -360,8 +374,6 @@ varchunk:
 tydec:
   "type" ID "=" ty { $$ = make_TypeDec(@$, $2, $4); }
 ;
-
-%token NAMETY "_namety";
 
 ty:
   ID                   { $$ = make_NameTy(@$, $1); }

@@ -39,7 +39,7 @@
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
 #define YY_USER_ACTION              \
-  td.location_.step();              \
+  td.location_.step();              \  //not mandatory
   td.location_.columns(yyleng);
 
 #define TOKEN(Type)                             \
@@ -168,7 +168,8 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 {space}     {}
 
-{endofline} { td.location_.lines(); }
+{endofline}+ { td.location_.lines(size());
+    td.location_.step(); }
 
 .           { ERROR("unexpected " << text()); } /* everything else is garbage */
 

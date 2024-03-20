@@ -241,10 +241,10 @@ sub_exps:
 %token CAST "_cast";
 exp:
   /* Literals */
-   NIL
+   NIL { $$ = make_NilExp(@$); }
   | INT { $$ = make_IntExp(@$, $1); }
   // FIXED: Some code was deleted here (More rules).
-  | STRING
+  | STRING { $$ = make_StringExp(@$, $1); }
 
   /* Array and record creations */
   | ID "[" exp "]" "of" exp
@@ -260,24 +260,24 @@ exp:
   /* Operations*/
   | "-" exp %prec UNARY
   /* Operations with op */
-  | exp "+" exp
-  | exp "-" exp
-  | exp "*" exp
-  | exp "/" exp
-  | exp "=" exp
-  | exp "<>" exp
-  | exp ">" exp
+  | exp "+" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::add, $3); }
+  | exp "-" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::sub, $3); }
+  | exp "*" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::mul, $3); }
+  | exp "/" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::div, $3); }
+  | exp "=" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::eq, $3); }
+  | exp "<>" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::ne, $3); }
+  | exp ">" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::gt, $3); }
   | "(" exps ")"
 
   /* Assignment */
   | lvalue ":=" exp
 
   /* Control structures */
-  | "if" exp "then" exp
-  | "if" exp "then" exp "else" exp
-  | "while" exp "do" exp
-  | "for" ID ":=" exp "to" exp "do" exp
-  | "break"
+  | "if" exp "then" exp { $$ = make_IfExp(@$, $2, $4); }
+  | "if" exp "then" exp "else" exp { $$ = make_IfExp(@$, $2, $4, $6); }
+  | "while" exp "do" exp { $$ = make_WhileExp(@$, $2, $4); }
+  | "for" ID ":=" exp "to" exp "do" exp  // { $$ = make_ForExp(@$, make_VarDec(@$, $2, nullptr,), $4, $8); }  need to recheck
+  | "break" { $$ = make_BreakExp(@$); }
   | "let" chunks "in" exps "end"
 
   /* cast of an expression to a given type*/

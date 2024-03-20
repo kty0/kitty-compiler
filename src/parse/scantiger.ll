@@ -39,6 +39,7 @@
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
 #define YY_USER_ACTION              \
+  td.location_.step();              \
   td.location_.columns(yyleng);
 
 #define TOKEN(Type)                             \
@@ -48,13 +49,13 @@
     parser::make_ ## Type(Value, td.location_)
 
 #define CHECK_EXTENSION()                              \
-    do {                                                  \
-        if (!td.enable_extensions_p_)                       \
-        td.error_ << misc::error::error_type::scan        \
-        << td.location_                         \
-        << ": invalid identifier: `"            \
-        << misc::escape(text()) << "'\n";       \
-    } while (false)
+  do {                                                  \
+    if (!td.enable_extensions_p_)                       \
+      td.error_ << misc::error::error_type::scan        \
+      << td.location_                         \
+      << ": invalid identifier: `"            \
+      << misc::escape(text()) << "'\n";       \
+  } while (false)
 
 #define ERROR(m)                                \
   td.error_ << misc::error::error_type::scan    \
@@ -67,26 +68,25 @@
 
     /* Abbreviations.  */
 int             [0-9]+
-    /* FIXING: Some code was deleted here. */
-space           [ \n\r]+
-id              [a-z][a-z0-9]*
+    /* FIXED: Some code was deleted here. */
+space           [ \t]
+endofline       ("\n\r")|("\r\n")|("\r")|("\n")
+id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
-%class{
-        // FIXING: Some code was deleted here (Local variables).
-        std::string grown_string{};
-        int nested = 0;
+%class {
+  // FIXED: Some code was deleted here (Local variables).
+  std::string grown_string{};
+  int nested = 0;
 }
 
 %%
 /* The rules.  */
-{int}         {
-    int val = 0;
-    // FIXING: Some code was deleted here (Decode, and check the value).
-    val = strtol(text(), 0, 10);
-    return TOKEN_VAL(INT, val);
-              }
+{int} { int val = 0;
+  // FIXING: Some code was deleted here (Decode, and check the value).
+  val = strtol(text(), 0, 10);
+  return TOKEN_VAL(INT, val); }
 
-/* FIXING: Some code was deleted here. */
+/* FIXED: Some code was deleted here. */
 
 "array" { return TOKEN(ARRAY); }
 "if" { return TOKEN(IF); }
@@ -107,6 +107,34 @@ id              [a-z][a-z0-9]*
 "type" { return TOKEN(TYPE); }
 "import" { return TOKEN(IMPORT); }
 "primitive" { return TOKEN(PRIMITIVE); }
+
+"_chunks" { return TOKEN(CHUNKS); }
+"_exp" { return TOKEN(EXP); }
+"_lvalue" { return TOKEN(LVALUE); }
+"_namety" { return TOKEN(NAMETY); }
+
+"_cast" { return TOKEN(CAST); }
+
+"class" { if (td.enable_object_extensions_p_) {
+    return TOKEN(CLASS);
+  } else {
+      ERROR("invalid identifier " << text());
+  } }
+"extends" { if (td.enable_object_extensions_p_) {
+    return TOKEN(EXTENDS);
+  } else {
+      ERROR("invalid identifier " << text());
+  } }
+"method" { if (td.enable_object_extensions_p_) {
+    return TOKEN(METHOD);
+  } else {
+      ERROR("invalid identifier " << text());
+  } }
+"new" { if (td.enable_object_extensions_p_) {
+    return TOKEN(NEW);
+  } else {
+      ERROR("invalid identifier " << text());
+  } }
 
 "," { return TOKEN(COMMA); }
 ":" { return TOKEN(COLON); }
@@ -140,16 +168,15 @@ id              [a-z][a-z0-9]*
 
 {space}     {}
 
+{endofline} { td.location_.lines(); }
+
 .           { ERROR("unexpected " << text()); } /* everything else is garbage */
 
 <SC_COMMENT> {
-"*/" {
-        nested--;
-        if (nested == 0)
-        {
-            start(INITIAL);
-        }
-    }
+"*/" { nested--;
+  if (nested == 0) {
+    start(INITIAL);
+  } }
 
 "/*"        { nested++; }
 
@@ -159,12 +186,30 @@ id              [a-z][a-z0-9]*
 }
 
 <SC_STRING> {
-"\""    {
-        start(INITIAL);
-        return TOKEN_VAL(STRING, grown_string);
-    }
+"\"" { start(INITIAL);
+  return TOKEN_VAL(STRING, grown_string); }
 
-\\x[0-9a-fA-F]{2}  { grown_string += strtol(text() + 2, 0, 16); }
+\\a { grown_string += '\a'; }
+\\b { grown_string += '\b'; }
+\\f { grown_string += '\f'; }
+\\n { grown_string += '\n'; }
+\\r { grown_string += '\r'; }
+\\t { grown_string += '\t'; }
+\\v { grown_string += '\v'; }
+
+\\[0-9]{3} { grown_string += strtol(text() + 1, 0, 8);
+  if (errno == ERANGE) {
+    ERROR("invalid octal num " << text());
+  } }
+
+\\ { grown_string += '\\'; }
+
+\\x[0-9a-fA-F]{2} { grown_string += strtol(text() + 2, 0, 16);
+  if (errno == ERANGE) {
+    ERROR("invalid hexa num " << text());
+  } }
+
+\\. { ERROR("invalid escaped character " << text()); }
 
 <<EOF>> { ERROR("expected \" got EOF"); start(INITIAL); }
 

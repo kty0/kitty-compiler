@@ -253,12 +253,12 @@ namespace ast
     if (fields.size() != 0)
     {
       ostr_ << fields[0]->name_get() << " = " << fields[0]->init_get();
-      for (auto it = fields.begin() = 1; it != fields.end(); it++)
+      for (auto it = fields.begin() + 1; it != fields.end(); it++)
       {
         ostr_ << " , " << (*it)->name_get() << " = " << (*it)->init_get();
       }
     }
-    ostr_ << " }"
+    ostr_ << " }";
   }
 
   void PrettyPrinter::operator()(const ast::SeqExp& e)

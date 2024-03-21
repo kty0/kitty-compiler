@@ -196,10 +196,20 @@ namespace ast
 
   void PrettyPrinter::operator()(const TypeDec& e)
   {
+    ostr_ << "type " << e.name_get() << " = " << e.ty_get();
   }
 
   void PrettyPrinter::operator()(const VarDec& e)
   {
+    ostr_ << "var " << e.name_get();
+
+    const NameTy* type_name = e.type_name_get();
+    if (type_name != nullptr)
+    {
+      ostr_ << ": " << type_name->name_get();
+    }
+
+    ostr_ << " := " << e.init_get() ;
   }
 
 } // namespace ast

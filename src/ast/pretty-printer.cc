@@ -41,7 +41,7 @@ namespace ast
   void PrettyPrinter::operator()(const FieldVar& e)
   {
     // FIXED: Some code was deleted here.
-    ostr_ << e.var_get() << '.' << e.name_get().get();
+    ostr_ << e.var_get() << '.' << e.name_get();
   }
 
   /* foo[10] */
@@ -199,6 +199,7 @@ namespace ast
     ostr_ << "type " << e.name_get() << " = " << e.ty_get();
   }
 
+  /* var x := 42 */
   void PrettyPrinter::operator()(const VarDec& e)
   {
     ostr_ << "var " << e.name_get();
@@ -206,7 +207,7 @@ namespace ast
     const NameTy* type_name = e.type_name_get();
     if (type_name != nullptr)
     {
-      ostr_ << ": " << type_name->name_get();
+      ostr_ << ": " << type_name;
     }
 
     ostr_ << " := " << e.init_get() ;

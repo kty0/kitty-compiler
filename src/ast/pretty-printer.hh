@@ -45,6 +45,14 @@ namespace ast
     void operator()(const FunctionDec& e) override;
     void operator()(const TypeDec& e) override;
     void operator()(const VarDec& e) override;
+    void operator()(const ast::IntExp& e) override;
+    void operator()(const ast::LetExp& e) override;
+    void operator()(const ast::NilExp& e) override;
+    void operator()(const ast::ObjectExp& e) override;
+    void operator()(const ast::OpExp& e) override;
+    void operator()(const ast::RecordExp& e) override;
+    void operator()(const ast::SeqExp& e) override;
+    void operator()(const ast::StringExp& e) override;
     /// \}
 
   private:

@@ -139,4 +139,25 @@ namespace ast
       << misc::decendl;
   }
 
+  void PrettyPrinter::operator()(const ArrayTy& e)
+  {
+    ostr_ << e.base_type_get();
+  }
+
+  void PrettyPrinter::operator()(const ClassTy& e)
+  {
+    ostr_ << e.super_get();
+  }
+
+  void PrettyPrinter::operator()(const NameTy& e)
+  {
+    ostr_ << e.name_get();
+  }
+
+  /* I'm unsure of what to do
+  void PrettyPrinter::operator()(const RecordTy& e)
+  {
+  }
+  */
+
 } // namespace ast

@@ -220,14 +220,14 @@ namespace ast
   void PrettyPrinter::operator()(const ast::LetExp& e)
   {
     ostr_ << "let" << misc::incindent;
-    auto chunks = e.chunks_get();
+    const ChunkList& chunks = e.chunks_get();
     for (auto it = chunks.begin(); it != chunks.end(); it++)
     {
       ostr_ << (*it);
     }
     ostr_ << misc::decindent;
     ostr_ << "in" << misc::incindent;
-    ostr_ << e.body_get() << misc::decindent();
+    ostr_ << e.body_get() << misc::decindent;
     ostr_ << "end";
   }
 
@@ -243,7 +243,7 @@ namespace ast
 
   void PrettyPrinter::operator()(const ast::OpExp& e)
   {
-    ostr_ << e.left_get() << " " << e.oper_get() << " " << e.right_get();
+    ostr_ << e.left_get() << " " << str(e.oper_get()) << " " << e.right_get();
   }
 
   void PrettyPrinter::operator()(const ast::RecordExp& e)

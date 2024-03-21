@@ -160,4 +160,46 @@ namespace ast
   }
   */
 
+  /* myfunc(a : int, b : string) : int =
+       exp */
+  void PrettyPrinter::operator()(const FunctionDec& e)
+  {
+    ostr_ << e.name_get() << '(';
+
+    const VarChunk& formals = e.formals_get();
+    if (!formals.empty())
+    {
+      for (auto it = formals.begin() + 1; it != formals.end(); it++)
+      {
+        if (it == formals.begin())
+        {
+          ostr_ << (*it)->name_get() << " : " << (*it)->type_name_get();
+        }
+        else
+        {
+          ostr_ << ", " << (*it)->name_get() << " : " << (*it)->type_name_get();
+        }
+      }
+    }
+
+    ostr_ << ')';
+
+    const NameTy* result = e.result_get();
+    if (result != nullptr)
+    {
+      ostr_ << " : " << result->name_get();
+    }
+
+    ostr_ << " =" << misc::incendl \
+      << e.body_get() << misc::decendl;
+  }
+
+  void PrettyPrinter::operator()(const TypeDec& e)
+  {
+  }
+
+  void PrettyPrinter::operator()(const VarDec& e)
+  {
+  }
+
 } // namespace ast

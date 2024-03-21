@@ -29,6 +29,7 @@ namespace ast
     void operator()(const FieldVar& e) override;
     void operator()(const SubscriptVar& e) override;
     void operator()(const CastExp& e) override;
+    // FIXME: Some code was deleted here.
     void operator()(const ArrayExp& e) override;
     void operator()(const AssignExp& e) override;
     void operator()(const BreakExp& e) override;
@@ -40,7 +41,10 @@ namespace ast
     void operator()(const ArrayTy& e) override;
     void operator()(const ClassTy& e) override;
     void operator()(const NameTy& e) override;
-    // FIXME: Some code was deleted here.
+    //void operator()(const RecordTy& e) override;
+    void operator()(const FunctionDec& e) override;
+    void operator()(const TypeDec& e) override;
+    void operator()(const VarDec& e) override;
     /// \}
 
   private:

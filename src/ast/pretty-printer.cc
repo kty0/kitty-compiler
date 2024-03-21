@@ -212,4 +212,72 @@ namespace ast
     ostr_ << " := " << e.init_get() ;
   }
 
+  void PrettyPrinter::operator()(const ast::IntExp& e)
+  {
+    ostr_ << e.value_get();
+  }
+
+  void PrettyPrinter::operator()(const ast::LetExp& e)
+  {
+    ostr_ << "let" << misc::incindent;
+    auto chunks = e.chunks_get();
+    for (auto it = chunks.begin(); it != chunks.end(); it++)
+    {
+      ostr_ << (*it);
+    }
+    ostr_ << misc::decindent;
+    ostr_ << "in" << misc::incindent;
+    ostr_ << e.body_get() << misc::decindent();
+    ostr_ << "end";
+  }
+
+  void PrettyPrinter::operator()(const ast::NilExp& e)
+  {
+    ostr_ << "nil";
+  }
+
+  void PrettyPrinter::operator()(const ast::ObjectExp& e)
+  {
+    ostr_ << "new " << e.type_name_get();
+  }
+
+  void PrettyPrinter::operator()(const ast::OpExp& e)
+  {
+    ostr_ << e.left_get() << " " << e.oper_get() << " " << e.right_get();
+  }
+
+  void PrettyPrinter::operator()(const ast::RecordExp& e)
+  {
+    ostr_ << e.type_name_get() << " { ";
+    auto fields = e.fields_get();
+    if (fields.size() != 0)
+    {
+      ostr_ << fields[0]->name_get() << " = " << fields[0]->init_get();
+      for (auto it = fields.begin() = 1; it != fields.end(); it++)
+      {
+        ostr_ << " , " << (*it)->name_get() << " = " << (*it)->init_get();
+      }
+    }
+    ostr_ << " }"
+  }
+
+  void PrettyPrinter::operator()(const ast::SeqExp& e)
+  {
+    auto exps = e.exps_get();
+    ostr_ << "(";
+    if (exps.size() != 0)
+    {
+      ostr_ << exps[0];
+      for (auto it = exps.begin() + 1; it != exps.end(); it++)
+      {
+        ostr_ << " ; " << (*it);
+      }
+    }
+    ostr_ << ")";
+  }
+
+  void PrettyPrinter::operator()(const ast::StringExp& e)
+  {
+    ostr_ << e.value_get();
+  }
 } // namespace ast

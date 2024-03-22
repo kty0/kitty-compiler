@@ -186,7 +186,9 @@
 %precedence "else"
 %precedence "do" "of"
 %precedence ":="
-%left "<>" "=" ">"
+%left "|"
+%left "&"
+%nonassoc ">=" "<=" "=" "<>" "<" ">"
 %left "+" "-"
 %left "*" "/"
 %type <ast::Exp*>             exp
@@ -230,15 +232,13 @@ program:
   // FIXED: Some code was deleted here (More rules).
 
 exps:
-    %empty
-    | exp sub_exps
+    %empty {$$ = make_exps_type();}
+    | exp sub_exps {$$ = $2, $$->emplace_back($1);}
 
 sub_exps:
-    %empty
-    | ";" exp sub_exps
+    %empty {$$ = make_exps_type();}
+    | ";" exp sub_exps {$$ = $3, $$->emplace_back($2)}
 
-%token EXP "_exp";
-%token CAST "_cast";
 exp:
   /* Literals */
    NIL { $$ = make_NilExp(@$); }
@@ -247,18 +247,21 @@ exp:
   | STRING { $$ = make_StringExp(@$, $1); }
 
   /* Array and record creations */
-  | ID "[" exp "]" "of" exp
+  | ID "[" exp "]" "of" exp  { $$ = make_ArrayExp(@$,$1,$3,$6);}
   // add NAMETY "(" INT ")" exp.... if need
-  | typeid "{" empty_type "}"
+  | typeid "{" empty_type "}" { $$ = make_RecordExp(@$,$1,$3);}
 
   /* Variables, field, elements of an array */
-  | lvalue
+  | lvalue { $$ = $1; }
 
   /* Function call */
-  | ID "(" extra_exp_1 ")"
+  | ID "(" extra_exp_1 ")" { $$ = make_CallExp(@$, $1, $2); }
 
   /* Operations*/
-  | "-" exp %prec UNARY
+  | "-" exp %prec UNARY { $$ = parse::parse(parse::Tweast() << "0 -" << $2); }
+  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if" << $1 << "then" << "<> 0 else 0"); }
+  | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if" << $1 << "then" << "1 else" << $3 << "<> 0"); }
+
   /* Operations with op */
   | exp "+" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::add, $3); }
   | exp "-" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::sub, $3); }
@@ -267,54 +270,56 @@ exp:
   | exp "=" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::eq, $3); }
   | exp "<>" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::ne, $3); }
   | exp ">" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::gt, $3); }
-  | "(" exps ")"
+  | exp "<" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::lt, $3); }
+  | exp ">=" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::ge, $3); }
+  | exp "<=" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::le, $3); }
+  | "(" exps ")" { $$ = make_SeqExp(@$, $2);}
 
   /* Assignment */
-  | lvalue ":=" exp
+  | lvalue ":=" exp { $$ = make_AssignExp(@$,$1,$3); }
 
   /* Control structures */
   | "if" exp "then" exp { $$ = make_IfExp(@$, $2, $4); }
   | "if" exp "then" exp "else" exp { $$ = make_IfExp(@$, $2, $4, $6); }
   | "while" exp "do" exp { $$ = make_WhileExp(@$, $2, $4); }
-  | "for" ID ":=" exp "to" exp "do" exp  // { $$ = make_ForExp(@$, make_VarDec(@$, $2, nullptr,), $4, $8); }  need to recheck
+  | "for" ID ":=" exp "to" exp "do" exp  { $$ = make_ForExp(@$, make_VarDec(@$, $2, nullptr,$4), $6, $8); }
   | "break" { $$ = make_BreakExp(@$); }
-  | "let" chunks "in" exps "end"
+  | "let" chunks "in" exps "end" { $$ =  make_LetExp(@$, make_ChunkList(@$) , $4); }
 
   /* cast of an expression to a given type*/
-  | CAST "(" exp "," ty ")" // reserved_id ?
+  | CAST "(" exp "," ty ")" { $$ = make_CastExp(@$, $3, $5); }
   /* an expression metavariable */
-  | EXP "(" INT ")"
+  | EXP "(" INT ")" { $$ = metavar<ast::Exp>(td, $3); }
   ;
 
 empty_type:
-    %empty
-    | ID "=" exp empty_type_2
+    %empty {$$ = make_fields_type();}
+    | ID "=" exp empty_type_2 { $$ = $4; $$->emplace_back(make_Field(@$,$1,$3))}
     ;
 
 empty_type_2:
-    %empty
-    | "," ID "=" exp empty_type_2
+    %empty {$$ = make_fields_type();}
+    | "," ID "=" exp empty_type_2 { $$ = $5; $$->emplace_back(make_Field(@$,$2,$4))}
     ;
 
 extra_exp_1:
-    %empty
-    | exp extra_exp_2
+    %empty { $$ = make_exps_type(); }
+    | exp extra_exp_2 { $$ = $2; $$->emplace_back($1); }
     ;
 
 extra_exp_2:
-    %empty
-    | "," exp
+    %empty { $$ = make_exps_type(); }
+    | "," exp extra_exp_2 { $$= $2; $$->emplace_back($1); }
     ;
 
-%token LVALUE "_lvalue";
 lvalue:
-    ID
+    ID { $$ = make_SimpleVar(@$,$1); }
     /* record field access */
-    | lvalue "." ID
+    | lvalue "." ID { $$ = make_FieldVar(@$, $1, $3); }
     /* array sub */
-    | lvalue "[" exp "]"
+    | lvalue "[" exp "]" { $$ = make_SubscriptVar(@$, $1, $3); }
     /* a l-value metavariable */
-    | LVALUE "(" INT ")"
+    | LVALUE "(" INT ")" { $$ = metavar<ast::Var>(td, $3); }
     ;
 
 /*---------------.
@@ -335,10 +340,10 @@ chunks:
   %empty                  { $$ = make_ChunkList(@$); }
 | tychunk   chunks        { $$ = $2; $$->push_front($1); }
   // FIXED: Some code was deleted here (More rules).
-| funchunk chunks
-| varchunk
-| "import" STRING
-| CHUNKS "(" INT ")" chunks
+| funchunk chunks          { $$ = $2; $$->push_front($1);}
+| varchunk                  { $$->push_front($1); }
+| "import" STRING   // idk
+| CHUNKS "(" INT ")" chunks { $$ = $5; $$->push_front(metavar<ast::ChunkList>(td, $3)) ; }
 ;
 
 /*--------------------.
@@ -353,22 +358,22 @@ tychunk:
 ;
 
 funchunk:
-  fundec CHUNKS
-| fundec funchunk
+  fundec CHUNKS  { $$ = make_FunctionChunk(@1); $$->push_front(*$1); }
+| fundec funchunk { $$ = $2; $$->push_front(*$1); }
 ;
 
 fundec:
-    "function" ID "(" tyfields ")" fundecbis "=" exp
-| "primitive" ID "(" tyfields ")" fundecbis
+  "function" ID "(" tyfields ")" fundecbis "=" exp { $$ = make_FunctionDec(@$, $1, make_VarChunk(@4),$6,$8);}
+| "primitive" ID "(" tyfields ")" fundecbis { $$ = make_FunctionDec(@$, $1, make_VarChunk(@4),$6, nullptr);}
 ;
 
 fundecbis:
-    %empty
-    | ":" typeid
+    %empty { $$ = make_Namety();}
+    | ":" typeid { $$ = make_Namety(@$,$2);}
     ;
 
 varchunk:
-    "var" ID fundecbis ":=" exp
+    "var" ID fundecbis ":=" exp { $$ = make_VarChunk(@(make_VarDec(@$, $2, $3, $4))); }
 ;
 
 tydec:

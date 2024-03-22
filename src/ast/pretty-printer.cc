@@ -159,23 +159,23 @@ namespace ast
     ostr_ << e.name_get() << " = " << e.init_get();
   }
 
-  /* myfunc(a : int, b : string) : int =
+  /* function myfunc(a : int, b : string) : int =
        exp */
   void PrettyPrinter::operator()(const FunctionDec& e)
   {
-    ostr_ << e.name_get() << '(';
+    ostr_ << "function " << e.name_get() << '(';
 
     const VarChunk& formals = e.formals_get();
     if (!formals.empty())
+    {
+      ostr_ << (*formals.begin())->name_get() << " : "
+        << (*formals.begin())->type_name_get();
+      for (auto it = formals.begin() + 1; it != formals.end(); it++)
       {
-        ostr_ << (*formals.begin())->name_get() << " : "
-              << (*formals.begin())->type_name_get();
-        for (auto it = formals.begin() + 1; it != formals.end(); it++)
-          {
-            ostr_ << ", " << (*it)->name_get() << " : "
-                  << (*it)->type_name_get();
-          }
+        ostr_ << ", " << (*it)->name_get() << " : "
+          << (*it)->type_name_get();
       }
+    }
 
     ostr_ << ')';
 
@@ -185,7 +185,7 @@ namespace ast
         ostr_ << " : " << result->name_get();
       }
 
-    ostr_ << " =" << misc::incendl << e.body_get() << misc::decindent;
+    ostr_ << " =" << misc::incendl << *e.body_get() << misc::decindent;
   }
 
   void PrettyPrinter::operator()(const TypeDec& e)
@@ -204,7 +204,7 @@ namespace ast
         ostr_ << ": " << type_name;
       }
 
-    ostr_ << " := " << e.init_get();
+    ostr_ << " := " << *e.init_get();
   }
 
   /* 42 */

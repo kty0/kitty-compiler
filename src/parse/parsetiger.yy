@@ -258,12 +258,12 @@ program:
 
 exps:
     %empty { $$ = make_exps_type();}
-    | exp sub_exps {$$ = $2, $$->emplace_back($1);}
+    | exp sub_exps {$$ = $2, $$->insert($$->begin(), $1);}
     ;
 
 sub_exps:
     %empty {$$ = make_exps_type();}
-    | ";" exp sub_exps {$$ = $3, $$->emplace_back($2);}
+    | ";" exp sub_exps {$$ = $3, $$->insert($$->begin(), $2);}
     ;
 
 exp:
@@ -311,7 +311,7 @@ exp:
   | "while" exp "do" exp { $$ = make_WhileExp(@$, $2, $4); }
   | "for" ID ":=" exp "to" exp "do" exp  { $$ = make_ForExp(@$, make_VarDec(@$, $2, nullptr,$4), $6, $8); }
   | "break" { $$ = make_BreakExp(@$); }
-  | "let" chunks "in" exps "end" { $$ =  make_LetExp(@$, make_ChunkList(@$), make_SeqExp(@4,$4)); }
+  | "let" chunks "in" exps "end" { $$ =  make_LetExp(@$, $2, make_SeqExp(@4,$4)); }
 
   /* cast of an expression to a given type*/
   | CAST "(" exp "," ty ")" { $$ = make_CastExp(@$, $3, $5); }
@@ -398,7 +398,7 @@ fundec:
 ;
 
 tyfields_fun:
-  %empty               { $$ = nullptr; }
+  %empty               { $$ = make_VarChunk(@$); }
 | tyfields_fun.1       { $$ = $1; }
 ;
 
@@ -412,7 +412,7 @@ tyfield_fun:
 ;
 
 varchunk:
-    vardec {$$ = make_VarChunk(@1); $$->push_front(*$1);};
+    vardec {$$ = make_VarChunk(@1); $$->push_front(*$1); };
 ;
 
 vardec:

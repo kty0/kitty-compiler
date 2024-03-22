@@ -36,8 +36,11 @@ namespace parse
 
     ast_type tree = td.parse_file(fname);
 
+    std::cout << "hello1\n";
     ast::Exp** exp = std::get_if<ast::Exp*>(&tree);
+    std::cout << "hello2\n";
     ast::ChunkList** chunks = std::get_if<ast::ChunkList*>(&tree);
+    std::cout << "hello2.5\n";
 
     // Try to parse the program as an expression, and check that the
     // parsing did not fail in that case.
@@ -45,17 +48,21 @@ namespace parse
       {
         Tweast in;
 
+            std::cout << "hello2.7\n";
         if (!prelude.empty())
           {
+            std::cout << "hello3\n";
             ast::ChunkList* prelude_chunks =
               (prelude == "builtin"
                  ? std::get<ast::ChunkList*>(td.parse(td.prelude()))
                  : td.parse_import(prelude, location()));
+            std::cout << "hello4\n";
             if (prelude_chunks)
               in << prelude_chunks;
           }
         in << "function _main() = (" << *exp << "; ())";
         res = td.parse(in);
+        std::cout << "bouh\n";
       }
     // Try to parse the program as a list of declarations, and check
     // that the parsing did not fail in that case.

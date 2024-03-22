@@ -234,7 +234,7 @@
 %token EXP  "_exp";
 program:
   /* Parsing a source program.  */
-  exp { td.ast_ = $1; }
+  exp { td.ast_ = $1; std::cout << "DONE\n"; }
 | /* Parsing an imported file.  */
   chunks { td.ast_ = $1; }
 ;
@@ -354,7 +354,7 @@ chunks:
 | tychunk   chunks        { $$ = $2; $$->push_front($1); }
   // FIXED: Some code was deleted here (More rules).
 | funchunk chunks         { $$ = $2; $$->push_front($1); }
-| varchunk                { $$->push_front($1); }
+| varchunk                { $$ = make_ChunkList(@$); $$->push_front($1); }
 //| "import" STRING   {$$ = TigerDriver::parse_import($2,@$)}// what to do with ? 
 | CHUNKS "(" INT ")" chunks  { $$ = $5; $$->splice_front(*metavar<ast::ChunkList>(td, $3)) ; }
 ;

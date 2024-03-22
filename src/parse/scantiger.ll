@@ -39,7 +39,6 @@
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
 #define YY_USER_ACTION              \
-  td.location_.step();              \  //not mandatory
   td.location_.columns(yyleng);
 
 #define TOKEN(Type)                             \
@@ -70,7 +69,7 @@
 int             [0-9]+
     /* FIXED: Some code was deleted here. */
 space           [ \t]
-endofline       ("\n\r")|("\r\n")|("\r")|("\n")
+endofline       (\n\r)|(\r\n)|(\r)|(\n)
 id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 %class {
@@ -96,9 +95,9 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 "for" { return TOKEN(FOR); }
 "to" { return TOKEN(TO); }
 "do" { return TOKEN(DO); }
-"let" { return TOKEN(LET); }
-"in" { return TOKEN(IN); }
-"end" { return TOKEN(END); }
+"let" { std::cout << "let\n"; return TOKEN(LET); }
+"in" { std::cout << "in\n"; return TOKEN(IN); }
+"end" { std::cout << "end\n"; return TOKEN(END); }
 "of" { return TOKEN(OF); }
 "break" { return TOKEN(BREAK); }
 "nil" { return TOKEN(NIL); }
@@ -168,7 +167,7 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 {space}     {}
 
-{endofline}+ { td.location_.lines(size());
+{endofline}+ { std::cout << "newline\n"; td.location_.lines(size());
     td.location_.step(); }
 
 .           { ERROR("unexpected " << text()); } /* everything else is garbage */

@@ -35,7 +35,10 @@ namespace misc
     requires ContainsTypeGet<U, T, Ts...>
   variant<T, Ts...>::operator U&()
   {
-    return std::get<U>(*this);
+    std::cout << "var3\n";
+    auto res = std::get<U>(*this);
+    std::cout << "var4\n";
+    return res;
   }
 
   template <typename T, typename... Ts>
@@ -44,7 +47,10 @@ namespace misc
   variant<T, Ts...>::operator const U&() const
   // FIXED: Some code was deleted here.
   {
-    return std::get<U>(*this);
+    std::cout << "var1\n";
+    auto res = std::get<U>(*this);
+    std::cout << "var2\n";
+    return res;
   }
 
   template <typename T, typename... Ts>

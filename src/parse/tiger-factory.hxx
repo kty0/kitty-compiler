@@ -159,7 +159,7 @@ namespace parse
 
   inline ast::ChunkList* make_ChunkList(const location& location)
   {
-    return new ast::ChunkList(location);
+    return new ast::ChunkList(location, {});
   }
 
   inline ast::TypeChunk* make_TypeChunk(const location& location)

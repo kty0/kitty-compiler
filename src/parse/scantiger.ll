@@ -39,6 +39,7 @@
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
 #define YY_USER_ACTION              \
+  td.location_.step();              \
   td.location_.columns(yyleng);
 
 #define TOKEN(Type)                             \

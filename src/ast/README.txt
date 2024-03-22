@@ -5,8 +5,14 @@ Incomplete classes are tagged with a `*'.
 
 /Ast/               (Location location)
   /Dec/             (symbol name)
+                      the dec class which contains a name as a symbol
     FunctionDec     (VarChunk formals, NameTy result, Exp body)
+                      contains the name of the function as a symbol,
+                      the arguments as a Chunk of VarDec,
+                      the type of the result as a NameTy*,
+                      the body of the function as the pointer to an Exp
       MethodDec     ()
+                      extends the fundctiondec
     TypeDec         (Ty ty)
     VarDec          (NameTy type_name, Exp init)
 
@@ -14,6 +20,8 @@ Incomplete classes are tagged with a `*'.
     /Var/           ()
       FieldVar      (Var var, symbol name)
       SimpleVar     (symbol name)
+                      contains the name of the variable as a symbol
+                      and a pointer to its declaration's node
       SubscriptVar  (Var var, Exp index)
 
     ArrayExp        (NameTy type_name, Exp size, Exp init)
@@ -24,7 +32,11 @@ Incomplete classes are tagged with a `*'.
     CastExp         (Exp exp, Ty ty)
     ForExp          (VarDec vardec, Exp hi, Exp body)
     IfExp           (Exp test, Exp thenclause, Exp elseclause)
+                      contains three Exp* for the test,
+                      the thenclause
+                      and the elseclause
     IntExp          (int value)
+                      container with an int inside
     LetExp          (ChunkList chunks, Exp body)
     NilExp          ()
     ObjectExp       (NameTy type_name)
@@ -32,12 +44,13 @@ Incomplete classes are tagged with a `*'.
     RecordExp       (NameTy type_name, fieldinits_type fields)
     SeqExp          (exps_type exps)
     StringExp       (string value)
+                      container with a string inside
     WhileExp        (Exp test, Exp body)
 
   /Ty/              ()
     ArrayTy         (NameTy base_type)
     ClassTy         (NameTy super, ChunkList chunks)
-    NameTy          (symbol name)
+    NameTy          (symbol name) 
     RecordTy        (fields_type fields)
 
   ChunkList         (list_type chunks)
@@ -46,4 +59,7 @@ Incomplete classes are tagged with a `*'.
 
   FieldInit         (symbol name, Exp init)
 
+Extra doc:
 
+    Chunk<T>        contains a vector of T*,
+                    can be directly iterated over

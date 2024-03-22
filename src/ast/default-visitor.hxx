@@ -33,7 +33,8 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<FieldVar>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.var_get().accept(*this);
   }
 
   template <template <typename> class Const>
@@ -58,7 +59,12 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<CallExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const exps_type& args = e.args_get();
+    for (auto it = args.begin(); it != args.end(); it++)
+    {
+      (*it)->accept(*this);
+    }
   }
 
   template <template <typename> class Const>
@@ -71,25 +77,41 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<RecordExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.type_name_get().accept(*this);
+    const fieldinits_type& fields = e.fields_get();
+    for (auto it = fields.begin(); it != fields.end(); it++)
+    {
+      (*it)->init_get().accept(*this);
+    }
   }
 
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<SeqExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const exps_type& args = e.exps_get();
+    for (auto it = args.begin(); it != args.end(); it++)
+    {
+      (*it)->accept(*this);
+    }
   }
 
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<AssignExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.var_get().accept(*this);
+    e.exp_get().accept(*this);
   }
 
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<IfExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.test_get().accept(*this);
+    e.thenclause_get().accept(*this);
+    e.elseclause_get().accept(*this);
   }
 
   template <template <typename> class Const>
@@ -114,13 +136,18 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<LetExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.chunks_get().accept(*this);
+    e.body_get().accept(*this);
   }
 
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<ArrayExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.type_name_get().accept(*this);
+    e.size_get().accept(*this);
+    e.init_get().accept(*this);
   }
 
   template <template <typename> class Const>
@@ -139,7 +166,12 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<ChunkList>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const ChunkList::list_type& chunks = e.chunks_get();
+    for (auto it = chunks.begin(); it != chunks.end(); it++)
+    {
+      (*it)->accept(*this);
+    }
   }
 
   template <template <typename> class Const>
@@ -180,7 +212,10 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<FunctionDec>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.formals_get().accept(*this);
+    e.result_get()->accept(*this);
+    e.body_get()->accept(*this);
   }
 
   template <template <typename> class Const>
@@ -202,7 +237,12 @@ namespace ast
   template <template <typename> class Const>
   void GenDefaultVisitor<Const>::operator()(const_t<RecordTy>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const fields_type& fields = e.fields_get();
+    for (auto it = fields.begin(); it != fields.end(); it++)
+    {
+      (*it)->accept(*this);
+    }
   }
 
   template <template <typename> class Const>

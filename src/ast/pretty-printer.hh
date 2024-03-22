@@ -29,7 +29,7 @@ namespace ast
     void operator()(const FieldVar& e) override;
     void operator()(const SubscriptVar& e) override;
     void operator()(const CastExp& e) override;
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
     void operator()(const ArrayExp& e) override;
     void operator()(const AssignExp& e) override;
     void operator()(const BreakExp& e) override;

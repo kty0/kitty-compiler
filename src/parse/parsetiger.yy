@@ -121,6 +121,20 @@
       return input->template take<T>(key);
     }
 
+/*
+    ast::VarChunk* convert(ast::fields_type* fields, const parse::location& l)
+    {
+      auto res = make_VarChunk(l);
+
+      for (auto f : *fields)
+      {
+        res->emplace_back(*make_VarDec(l, f->name_get(), &(f->type_name_get()), nullptr));
+      }
+
+      return res;
+    }
+    */
+
   }
 }
 
@@ -203,8 +217,8 @@
 %type <ast::TypeDec*>         tydec
 %type <ast::FunctionChunk*>   funchunk
 %type <ast::FunctionDec*>     fundec
-%type <ast::VarChunk*>        varchunk
-%type <ast::VarDec*>          vardec
+%type <ast::VarChunk*>        varchunk tyfields_fun.1 tyfields_fun
+%type <ast::VarDec*>          vardec tyfield_fun
 %type <ast::NameTy*>          typeid fundecbis
 %type <ast::Ty*>              ty
 
@@ -222,6 +236,7 @@
 // a unique TypeDec each, or a single TypeChunk containing two TypeDec.
 // We want the latter.
 %precedence CHUNKS
+%precedence "primitive" "function"
 %precedence TYPE
 // FIXED: Some code was deleted here (Other declarations).
 %precedence UNARY
@@ -234,7 +249,7 @@
 %token EXP  "_exp";
 program:
   /* Parsing a source program.  */
-  exp { td.ast_ = $1; std::cout << "DONE\n"; }
+  exp { td.ast_ = $1; }
 | /* Parsing an imported file.  */
   chunks { td.ast_ = $1; }
 ;
@@ -356,7 +371,7 @@ chunks:
 | funchunk chunks         { $$ = $2; $$->push_front($1); }
 | varchunk                { $$ = make_ChunkList(@$); $$->push_front($1); }
 //| "import" STRING   {$$ = TigerDriver::parse_import($2,@$)}// what to do with ? 
-| CHUNKS "(" INT ")" chunks  { $$ = $5; $$->splice_front(*metavar<ast::ChunkList>(td, $3)) ; }
+| CHUNKS "(" INT ")" chunks  { $$ = metavar<ast::ChunkList>(td, $3); $$->splice_back(*$5) ; }
 ;
 
 /*--------------------.
@@ -371,15 +386,30 @@ tychunk:
 ;
 
 funchunk:
-  fundec CHUNKS     { $$ = make_FunctionChunk(@1); $$->push_front(*$1); }
-| fundec funchunk   { $$ = $2; $$->push_front(*$1); }
+  fundec %prec CHUNKS { $$ = make_FunctionChunk(@1); $$->push_front(*$1); }
+| fundec funchunk     { $$ = $2; $$->push_front(*$1); }
 ;
 
 fundec:
-  "function" ID "(" tyfields ")" fundecbis "=" exp  { $$ = make_FunctionDec(@$, $2, make_VarChunk(@4),$6,$8);}
-| "primitive" ID "(" tyfields ")" fundecbis { $$ = make_FunctionDec(@$, $2, make_VarChunk(@4),$6, nullptr);}
+  "function" ID "(" tyfields_fun ")" "=" exp              { $$ = make_FunctionDec(@$, $2, $4, nullptr, $7);}
+| "function" ID "(" tyfields_fun ")" ":" typeid "=" exp   { $$ = make_FunctionDec(@$, $2, $4, $7, $9);}
+| "primitive" ID "(" tyfields_fun ")"                     { $$ = make_FunctionDec(@$, $2, $4, nullptr, nullptr);}
+| "primitive" ID "(" tyfields_fun ")" ":" typeid          { $$ = make_FunctionDec(@$, $2, $4, $7, nullptr);}
 ;
 
+tyfields_fun:
+  %empty               { $$ = nullptr; }
+| tyfields_fun.1       { $$ = $1; }
+;
+
+tyfields_fun.1:
+  tyfields_fun.1 "," tyfield_fun { $$ = $1; $$->emplace_back(*$3); }
+| tyfield_fun                { $$ = make_VarChunk(@1); $$->emplace_back(*$1); }
+;
+
+tyfield_fun:
+  ID ":" typeid     { $$ = make_VarDec(@$, $1, $3, nullptr); }
+;
 
 varchunk:
     vardec {$$ = make_VarChunk(@1); $$->push_front(*$1);};

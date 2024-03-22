@@ -95,9 +95,9 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 "for" { return TOKEN(FOR); }
 "to" { return TOKEN(TO); }
 "do" { return TOKEN(DO); }
-"let" { std::cout << "let\n"; return TOKEN(LET); }
-"in" { std::cout << "in\n"; return TOKEN(IN); }
-"end" { std::cout << "end\n"; return TOKEN(END); }
+"let" { return TOKEN(LET); }
+"in" { return TOKEN(IN); }
+"end" { return TOKEN(END); }
 "of" { return TOKEN(OF); }
 "break" { return TOKEN(BREAK); }
 "nil" { return TOKEN(NIL); }
@@ -167,7 +167,7 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 {space}     {}
 
-{endofline}+ { std::cout << "newline\n"; td.location_.lines(size());
+{endofline}+ { td.location_.lines(size());
     td.location_.step(); }
 
 .           { ERROR("unexpected " << text()); } /* everything else is garbage */

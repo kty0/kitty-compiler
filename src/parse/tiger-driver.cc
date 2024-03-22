@@ -55,9 +55,7 @@ namespace parse
   /// Parse a Tiger file or string.
   ast_type TigerDriver::parse_()
   {
-    std::cout << "hellow1\n";
     std::string* fn = std::get_if<std::string>(&input_);
-    std::cout << "hellow2\n";
 
     /* The (address of) the string behind the symbol FILENAME is
        guaranteed to remain valid even after the symbol has been
@@ -74,10 +72,8 @@ namespace parse
     if (fn == nullptr)
     {
       // Parse a Tweast.
-    std::cout << "hellow3\n";
       in = (std::make_shared<std::stringstream>(
         std::get<Tweast*>(input_)->input_get()));
-    std::cout << "hellow4\n";
     }
     else if (*fn == "-")
       // Parse from the standard input.
@@ -103,8 +99,6 @@ namespace parse
 
     // FIXED: Some code was deleted here (Run the parser).
     parser.parse();
-
-    std::cout << "finished parsing\n";
 
     ast_type res = ast_;
     ast_ = static_cast<ast::Exp*>(nullptr);

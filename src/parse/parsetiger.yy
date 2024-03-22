@@ -192,18 +192,28 @@
 %left "+" "-"
 %left "*" "/"
 %type <ast::Exp*>             exp
+%type <ast::exps_type*>       exps sub_exps extra_exp_1 extra_exp_2
 %type <ast::ChunkList*>       chunks
+%type <ast::Var*>             lvalue
+
+%type <ast::fieldinits_type*> empty_type empty_type_2
+
 
 %type <ast::TypeChunk*>       tychunk
 %type <ast::TypeDec*>         tydec
-%type <ast::NameTy*>          typeid
+%type <ast::FunctionChunk*>   funchunk
+%type <ast::FunctionDec*>     fundec
+%type <ast::VarChunk*>        varchunk
+%type <ast::VarDec*>          vardec
+%type <ast::NameTy*>          typeid fundecbis
 %type <ast::Ty*>              ty
 
 %type <ast::Field*>           tyfield
 %type <ast::fields_type*>     tyfields tyfields.1
+
   // FIXME: Some code was deleted here (More %types).
 
-  // FIXME: Some code was deleted here (Priorities/associativities).
+  // FIXED: Some code was deleted here (Priorities/associativities).
 
 // Solving conflicts on:
 // let type foo = bar
@@ -232,12 +242,14 @@ program:
   // FIXED: Some code was deleted here (More rules).
 
 exps:
-    %empty {$$ = make_exps_type();}
+    %empty { $$ = make_exps_type();}
     | exp sub_exps {$$ = $2, $$->emplace_back($1);}
+    ;
 
 sub_exps:
     %empty {$$ = make_exps_type();}
-    | ";" exp sub_exps {$$ = $3, $$->emplace_back($2)}
+    | ";" exp sub_exps {$$ = $3, $$->emplace_back($2);}
+    ;
 
 exp:
   /* Literals */
@@ -247,15 +259,15 @@ exp:
   | STRING { $$ = make_StringExp(@$, $1); }
 
   /* Array and record creations */
-  | ID "[" exp "]" "of" exp  { $$ = make_ArrayExp(@$,$1,$3,$6);}
+  | ID "[" exp "]" "of" exp  { $$ = make_ArrayExp(@$,make_NameTy(@1,$1),$3,$6);}
   // add NAMETY "(" INT ")" exp.... if need
   | typeid "{" empty_type "}" { $$ = make_RecordExp(@$,$1,$3);}
 
   /* Variables, field, elements of an array */
-  | lvalue { $$ = $1; }
+  | lvalue { $$ = $1;}
 
   /* Function call */
-  | ID "(" extra_exp_1 ")" { $$ = make_CallExp(@$, $1, $2); }
+  | ID "(" extra_exp_1 ")" { $$ = make_CallExp(@$, $1, $3); }
 
   /* Operations*/
   | "-" exp %prec UNARY { $$ = parse::parse(parse::Tweast() << "0 -" << $2); }
@@ -284,7 +296,7 @@ exp:
   | "while" exp "do" exp { $$ = make_WhileExp(@$, $2, $4); }
   | "for" ID ":=" exp "to" exp "do" exp  { $$ = make_ForExp(@$, make_VarDec(@$, $2, nullptr,$4), $6, $8); }
   | "break" { $$ = make_BreakExp(@$); }
-  | "let" chunks "in" exps "end" { $$ =  make_LetExp(@$, make_ChunkList(@$) , $4); }
+  | "let" chunks "in" exps "end" { $$ =  make_LetExp(@$, make_ChunkList(@$), make_SeqExp(@4,$4)); }
 
   /* cast of an expression to a given type*/
   | CAST "(" exp "," ty ")" { $$ = make_CastExp(@$, $3, $5); }
@@ -293,13 +305,14 @@ exp:
   ;
 
 empty_type:
-    %empty {$$ = make_fields_type();}
-    | ID "=" exp empty_type_2 { $$ = $4; $$->emplace_back(make_Field(@$,$1,$3))}
+    %empty {$$ = make_fieldinits_type();}
+    | ID "=" exp empty_type_2 { $$ = $4; $$->emplace_back(make_FieldInit(@$,$1,$3));}
+
     ;
 
 empty_type_2:
-    %empty {$$ = make_fields_type();}
-    | "," ID "=" exp empty_type_2 { $$ = $5; $$->emplace_back(make_Field(@$,$2,$4))}
+    %empty {$$ = make_fieldinits_type();}
+    | "," ID "=" exp empty_type_2 { $$ = $5; $$->emplace_back(make_FieldInit(@$,$2,$4));}
     ;
 
 extra_exp_1:
@@ -309,7 +322,7 @@ extra_exp_1:
 
 extra_exp_2:
     %empty { $$ = make_exps_type(); }
-    | "," exp extra_exp_2 { $$= $2; $$->emplace_back($1); }
+    | "," exp extra_exp_2 { $$ = $3; $$->emplace_back($2); }
     ;
 
 lvalue:
@@ -340,10 +353,10 @@ chunks:
   %empty                  { $$ = make_ChunkList(@$); }
 | tychunk   chunks        { $$ = $2; $$->push_front($1); }
   // FIXED: Some code was deleted here (More rules).
-| funchunk chunks          { $$ = $2; $$->push_front($1);}
-| varchunk                  { $$->push_front($1); }
-| "import" STRING   // idk
-| CHUNKS "(" INT ")" chunks { $$ = $5; $$->push_front(metavar<ast::ChunkList>(td, $3)) ; }
+| funchunk chunks         { $$ = $2; $$->push_front($1); }
+| varchunk                { $$->push_front($1); }
+//| "import" STRING   {$$ = TigerDriver::parse_import($2,@$)}// what to do with ? 
+| CHUNKS "(" INT ")" chunks  { $$ = $5; $$->splice_front(*metavar<ast::ChunkList>(td, $3)) ; }
 ;
 
 /*--------------------.
@@ -358,23 +371,28 @@ tychunk:
 ;
 
 funchunk:
-  fundec CHUNKS  { $$ = make_FunctionChunk(@1); $$->push_front(*$1); }
-| fundec funchunk { $$ = $2; $$->push_front(*$1); }
+  fundec CHUNKS     { $$ = make_FunctionChunk(@1); $$->push_front(*$1); }
+| fundec funchunk   { $$ = $2; $$->push_front(*$1); }
 ;
 
 fundec:
-  "function" ID "(" tyfields ")" fundecbis "=" exp { $$ = make_FunctionDec(@$, $1, make_VarChunk(@4),$6,$8);}
-| "primitive" ID "(" tyfields ")" fundecbis { $$ = make_FunctionDec(@$, $1, make_VarChunk(@4),$6, nullptr);}
+  "function" ID "(" tyfields ")" fundecbis "=" exp  { $$ = make_FunctionDec(@$, $2, make_VarChunk(@4),$6,$8);}
+| "primitive" ID "(" tyfields ")" fundecbis { $$ = make_FunctionDec(@$, $2, make_VarChunk(@4),$6, nullptr);}
 ;
 
-fundecbis:
-    %empty { $$ = make_Namety();}
-    | ":" typeid { $$ = make_Namety(@$,$2);}
-    ;
 
 varchunk:
-    "var" ID fundecbis ":=" exp { $$ = make_VarChunk(@(make_VarDec(@$, $2, $3, $4))); }
+    vardec {$$ = make_VarChunk(@1); $$->push_front(*$1);};
 ;
+
+vardec:
+    "var" ID fundecbis ":=" exp { $$ = make_VarDec(@$, $2, $3, $5); }
+    ;
+
+fundecbis:
+    %empty {$$ = nullptr;}
+    | ":" typeid { $$ = $2;}
+    ;
 
 tydec:
   "type" ID "=" ty { $$ = make_TypeDec(@$, $2, $4); }

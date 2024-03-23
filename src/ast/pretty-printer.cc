@@ -274,7 +274,7 @@ namespace ast
    */
   void PrettyPrinter::operator()(const ast::StringExp& e)
   {
-    ostr_ << e.value_get();
+    ostr_ << '"' << e.value_get() << '"';
   }
 
 } // namespace ast

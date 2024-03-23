@@ -62,9 +62,9 @@ namespace ast
     // FIXED: Some code was deleted here.
     const exps_type& args = e.args_get();
     for (auto it = args.begin(); it != args.end(); it++)
-    {
-      (*it)->accept(*this);
-    }
+      {
+        (*it)->accept(*this);
+      }
   }
 
   template <template <typename> class Const>
@@ -81,9 +81,9 @@ namespace ast
     e.type_name_get().accept(*this);
     const fieldinits_type& fields = e.fields_get();
     for (auto it = fields.begin(); it != fields.end(); it++)
-    {
-      (*it)->init_get().accept(*this);
-    }
+      {
+        (*it)->init_get().accept(*this);
+      }
   }
 
   template <template <typename> class Const>
@@ -92,9 +92,9 @@ namespace ast
     // FIXED: Some code was deleted here.
     const exps_type& args = e.exps_get();
     for (auto it = args.begin(); it != args.end(); it++)
-    {
-      (*it)->accept(*this);
-    }
+      {
+        (*it)->accept(*this);
+      }
   }
 
   template <template <typename> class Const>
@@ -169,9 +169,9 @@ namespace ast
     // FIXED: Some code was deleted here.
     const ChunkList::list_type& chunks = e.chunks_get();
     for (auto it = chunks.begin(); it != chunks.end(); it++)
-    {
-      (*it)->accept(*this);
-    }
+      {
+        (*it)->accept(*this);
+      }
   }
 
   template <template <typename> class Const>
@@ -240,9 +240,9 @@ namespace ast
     // FIXED: Some code was deleted here.
     const fields_type& fields = e.fields_get();
     for (auto it = fields.begin(); it != fields.end(); it++)
-    {
-      (*it)->accept(*this);
-    }
+      {
+        (*it)->accept(*this);
+      }
   }
 
   template <template <typename> class Const>

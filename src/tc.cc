@@ -38,18 +38,15 @@ int main(int argc, char** argv)
   // Required to enable stack unwinding.
   catch (const std::invalid_argument& e)
     {
-      std::cout << "e1\n";
       return 64;
     }
   catch (const std::runtime_error& e)
     {
-      std::cout << "e2\n";
       if (e.what() != std::string(""))
         std::cerr << e.what() << '\n';
     }
   catch (const misc::error& e)
     {
-      std::cout << "e3\n";
       std::cerr << e;
       return e.status_get_value();
     }

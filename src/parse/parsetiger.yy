@@ -94,7 +94,7 @@
 # include <ast/chunk-list.hh>
 }
 
-  // FIXME: Some code was deleted here (Printers and destructors).
+  // FIXED: Some code was deleted here (Printers and destructors).
 
 /*-----------------------------------------.
 | Code output in the implementation file.  |
@@ -120,21 +120,6 @@
       parse::Tweast* input = td.input_;
       return input->template take<T>(key);
     }
-
-/*
-    ast::VarChunk* convert(ast::fields_type* fields, const parse::location& l)
-    {
-      auto res = make_VarChunk(l);
-
-      for (auto f : *fields)
-      {
-        res->emplace_back(*make_VarDec(l, f->name_get(), &(f->type_name_get()), nullptr));
-      }
-
-      return res;
-    }
-    */
-
   }
 }
 
@@ -225,7 +210,7 @@
 %type <ast::Field*>           tyfield
 %type <ast::fields_type*>     tyfields tyfields.1
 
-  // FIXME: Some code was deleted here (More %types).
+  // FIXED: Some code was deleted here (More %types).
 
   // FIXED: Some code was deleted here (Priorities/associativities).
 
@@ -240,7 +225,7 @@
 %precedence TYPE
 // FIXED: Some code was deleted here (Other declarations).
 %precedence UNARY
-  // FIXME: Some code was deleted here (Other declarations).
+  // FIXED: Some code was deleted here (Other declarations).
 
 %start program
 
@@ -322,7 +307,6 @@ exp:
 empty_type:
     %empty {$$ = make_fieldinits_type();}
     | ID "=" exp empty_type_2 { $$ = $4; $$->emplace_back(make_FieldInit(@$,$1,$3));}
-
     ;
 
 empty_type_2:

@@ -70,11 +70,11 @@ namespace parse
 
     std::shared_ptr<std::istream> in;
     if (fn == nullptr)
-    {
-      // Parse a Tweast.
-      in = (std::make_shared<std::stringstream>(
-        std::get<Tweast*>(input_)->input_get()));
-    }
+      {
+        // Parse a Tweast.
+        in = (std::make_shared<std::stringstream>(
+          std::get<Tweast*>(input_)->input_get()));
+      }
     else if (*fn == "-")
       // Parse from the standard input.
       in.reset(&std::cin, [](...) {});

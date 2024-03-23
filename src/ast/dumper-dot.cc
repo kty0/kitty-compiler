@@ -37,9 +37,9 @@ namespace ast
   void DumperDot::operator()(const ArrayExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "ArrayExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
@@ -55,9 +55,9 @@ namespace ast
   void DumperDot::operator()(const AssignExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "AssignExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
@@ -71,11 +71,11 @@ namespace ast
   void DumperDot::operator()(const CallExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "CallExp");
-    // FIXME: Some code was deleted here (node_html_field).
+    // IGNORED: Some code was deleted here (node_html_field).
     node_html_ports();
-    // FIXME: Some code was deleted here (node_html_port_list for each list).
+    // IGNORED: Some code was deleted here (node_html_port_list for each list).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump_list).
+    // IGNORED: Some code was deleted here (dump_list).
     parent_id = old_parent_id;
   }
 
@@ -122,10 +122,10 @@ namespace ast
   void DumperDot::operator()(const FieldVar& e)
   {
     unsigned long old_parent_id = node_html_header(e, "FieldVar");
-    // FIXME: Some code was deleted here (node_html_field).
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_field).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
@@ -155,9 +155,9 @@ namespace ast
   void DumperDot::operator()(const IfExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "IfExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
@@ -172,20 +172,20 @@ namespace ast
   void DumperDot::operator()(const LetExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "LetExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
   void DumperDot::operator()(const MethodCallExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "MethodCallExp");
-    // FIXME: Some code was deleted here (node_html_field).
-    // FIXME: Some code was deleted here (node_html_ports with properties).
-    // FIXME: Some code was deleted here (node_html_port_list for each list).
+    // IGNORED: Some code was deleted here (node_html_field).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_port_list for each list).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump and dump_list).
+    // IGNORED: Some code was deleted here (dump and dump_list).
     parent_id = old_parent_id;
   }
 
@@ -219,9 +219,9 @@ namespace ast
   void DumperDot::operator()(const ObjectExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "ObjectExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump).
+    // IGNORED: Some code was deleted here (dump).
     parent_id = old_parent_id;
   }
 
@@ -239,10 +239,10 @@ namespace ast
   void DumperDot::operator()(const RecordExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "RecordExp");
-    // FIXME: Some code was deleted here (node_html_ports with properties).
-    // FIXME: Some code was deleted here (node_html_port_list for each list).
+    // IGNORED: Some code was deleted here (node_html_ports with properties).
+    // IGNORED: Some code was deleted here (node_html_port_list for each list).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump and dump_list).
+    // IGNORED: Some code was deleted here (dump and dump_list).
     parent_id = old_parent_id;
   }
 
@@ -250,9 +250,9 @@ namespace ast
   {
     unsigned long old_parent_id = node_html_header(e, "RecordTy");
     node_html_ports();
-    // FIXME: Some code was deleted here (node_html_port_list for each list).
+    // IGNORED: Some code was deleted here (node_html_port_list for each list).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump_list).
+    // IGNORED: Some code was deleted here (dump_list).
     parent_id = old_parent_id;
   }
 
@@ -260,9 +260,9 @@ namespace ast
   {
     unsigned long old_parent_id = node_html_header(e, "SeqExp");
     node_html_ports();
-    // FIXME: Some code was deleted here (node_html_port_list for each list).
+    // IGNORED: Some code was deleted here (node_html_port_list for each list).
     footer_and_link(old_parent_id);
-    // FIXME: Some code was deleted here (dump_list).
+    // IGNORED: Some code was deleted here (dump_list).
     parent_id = old_parent_id;
   }
 
@@ -277,7 +277,7 @@ namespace ast
   void DumperDot::operator()(const StringExp& e)
   {
     unsigned long old_parent_id = node_html_header(e, "StringExp");
-    // FIXME: Some code was deleted here (node_html_field, use misc::escape).
+    // IGNORED: Some code was deleted here (node_html_field, use misc::escape).
     footer_and_link(old_parent_id);
     parent_id = old_parent_id;
   }

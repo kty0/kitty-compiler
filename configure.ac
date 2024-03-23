@@ -240,7 +240,7 @@ BOOST_PROGRAM_OPTIONS
 BOOST_STRING_ALGO
 BOOST_SYSTEM
 
-  dnl FIXME: Some code was deleted here.
+  dnl IGNORED: Some code was deleted here.
 
 ## ------ ##
 ## Tcsh.  ##

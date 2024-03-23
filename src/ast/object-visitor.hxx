@@ -27,31 +27,31 @@ namespace ast
   template <template <typename> class Const>
   void GenObjectVisitor<Const>::operator()(const_t<ClassTy>& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   template <template <typename> class Const>
   void GenObjectVisitor<Const>::operator()(const_t<MethodChunk>& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   template <template <typename> class Const>
   void GenObjectVisitor<Const>::operator()(const_t<MethodDec>& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   template <template <typename> class Const>
   void GenObjectVisitor<Const>::operator()(const_t<MethodCallExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   template <template <typename> class Const>
   void GenObjectVisitor<Const>::operator()(const_t<ObjectExp>& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
 } // namespace ast

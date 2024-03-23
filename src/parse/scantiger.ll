@@ -39,8 +39,8 @@
 
   // FIXED: Some code was deleted here (Define YY_USER_ACTION to update locations).
 #define YY_USER_ACTION              \
-  td.location_.step();              \
-  td.location_.columns(yyleng);
+  td.location_.columns(yyleng); \
+  td.location_.step();
 
 #define TOKEN(Type)                             \
     parser::make_ ## Type(td.location_)
@@ -70,7 +70,7 @@
 int             [0-9]+
     /* FIXED: Some code was deleted here. */
 space           [ \t]
-endofline       ("\n\r")|("\r\n")|("\r")|("\n")
+endofline       (\n\r)|(\r\n)|(\r)|(\n)
 id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 %class {
@@ -168,7 +168,7 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 {space}     {}
 
-{endofline} { td.location_.lines(); }
+{endofline} { td.location_.lines(1);}
 
 .           { ERROR("unexpected " << text()); } /* everything else is garbage */
 

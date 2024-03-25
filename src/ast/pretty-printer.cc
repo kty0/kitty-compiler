@@ -3,6 +3,7 @@
  ** \brief Implementation of ast::PrettyPrinter.
  */
 
+#include <vector>
 #include <ast/all.hh>
 #include <ast/libast.hh>
 #include <ast/pretty-printer.hh>
@@ -283,14 +284,20 @@ namespace ast
         ostr_ << "()";
         return;
       }
+    else if (e.exps_get().size() == 1)
+      {
+        std::vector<Exp*> exp = e.exps_get();
+        ostr_ << **exp.begin();
+        return;
+      }
 
     std::vector<Exp*> exps = e.exps_get();
 
     ostr_ << '(' << misc::incendl << **exps.begin();
     for (auto it = exps.begin() + 1; it != exps.end(); it++)
-    {
-      ostr_ << ';' << misc::iendl << *(*it);
-    }
+      {
+        ostr_ << ';' << misc::iendl << *(*it);
+      }
     ostr_ << misc::decendl << ')';
   }
 

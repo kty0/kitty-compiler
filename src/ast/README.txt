@@ -59,6 +59,11 @@ Incomplete classes are tagged with a `*'.
 
   FieldInit         (symbol name, Exp init)
 
+Some of these classes also inherit from other classes.
+
+/Escapable/
+  VarDec            (NameTy type_name, Exp init)
+
 Extra doc:
 
     Chunk<T>        contains a vector of T*,

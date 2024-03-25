@@ -81,9 +81,13 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 
 %%
 /* The rules.  */
-{int} { int val = 0;
+{int} { long long val = 0;
   // FIXING: Some code was deleted here (Decode, and check the value).
-  val = strtol(text(), 0, 10);
+  val = strtoll(text(), 0, 10);
+  if (val < -2147483648 || val > 2147483647)
+  {
+    ERROR("invalid integer " << text());
+  }
   return TOKEN_VAL(INT, val); }
 
 /* FIXED: Some code was deleted here. */
@@ -197,10 +201,16 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 \\t { grown_string += '\t'; }
 \\v { grown_string += '\v'; }
 
-\\[0-9]{3} { grown_string += strtol(text() + 1, 0, 8);
+\\[0-9]{3} { int val = 0;
+  val = strtol(text() + 1, 0, 10);
+  if (errno == ERANGE || val > 377) {
+    ERROR("invalid octal num " << text());
+  }
+  val = strtol(text() + 1, 0, 8);
   if (errno == ERANGE) {
     ERROR("invalid octal num " << text());
-  } }
+  }
+  grown_string += val; }
 
 \\ { grown_string += '\\'; }
 

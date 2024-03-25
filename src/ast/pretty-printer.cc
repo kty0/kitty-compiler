@@ -119,8 +119,8 @@ namespace ast
    */
   void PrettyPrinter::operator()(const IfExp& e)
   {
-    ostr_ << "if " << e.test_get() << misc::incendl << "then "
-          << e.thenclause_get() << "else " << e.elseclause_get()
+    ostr_ << "if " << misc::incindent << e.test_get() << misc::iendl << "then "
+          << e.thenclause_get() << misc::iendl << "else " << e.elseclause_get()
           << misc::decindent;
   }
 
@@ -150,7 +150,7 @@ namespace ast
    */
   void PrettyPrinter::operator()(const ChunkList& e)
   {
-    ostr_ << misc::separate(e.chunks_get(), '\n');
+    ostr_ << misc::separate(e.chunks_get(), misc::iendl);
   }
 
   /* x = 5 */
@@ -169,11 +169,11 @@ namespace ast
     if (!formals.empty())
       {
         ostr_ << (*formals.begin())->name_get() << " : "
-              << (*formals.begin())->type_name_get();
+              << *(*formals.begin())->type_name_get();
         for (auto it = formals.begin() + 1; it != formals.end(); it++)
           {
             ostr_ << ", " << (*it)->name_get() << " : "
-                  << (*it)->type_name_get();
+                  << *(*it)->type_name_get();
           }
       }
 
@@ -183,6 +183,12 @@ namespace ast
     if (result != nullptr)
       {
         ostr_ << " : " << result->name_get();
+      }
+
+    if (e.body_get() == nullptr)
+      {
+        ostr_ << misc::iendl;
+        return;
       }
 
     ostr_ << " =" << misc::incendl << *e.body_get() << misc::decindent;
@@ -261,8 +267,14 @@ namespace ast
         return;
       }
 
-    ostr_ << '(' << misc::incendl << misc::separate(e.exps_get(), ";\n")
-          << misc::decendl << ')';
+    std::vector<Exp*> exps = e.exps_get();
+
+    ostr_ << '(' << misc::incendl << **exps.begin();
+    for (auto it = exps.begin() + 1; it != exps.end(); it++)
+    {
+      ostr_ << ';' << misc::iendl << *(*it);
+    }
+    ostr_ << misc::decendl << ')';
   }
 
   /* "Never gonna give you up

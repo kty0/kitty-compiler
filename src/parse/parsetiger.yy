@@ -271,8 +271,8 @@ exp:
 
   /* Operations*/
   | "-" exp %prec UNARY { $$ = parse::parse(parse::Tweast() << "0 -" << $2); }
-  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if" << $1 << "then" << "<> 0 else 0"); }
-  | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if" << $1 << "then" << "1 else" << $3 << "<> 0"); }
+  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << $3 << " <> 0 else 0"); }
+  | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << " 1 else " << $3 << " <> 0"); }
 
   /* Operations with op */
   | exp "+" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::add, $3); }
@@ -337,7 +337,6 @@ lvalue:
 /*---------------.
 | Declarations.  |
 `---------------*/
-
 %token CHUNKS "_chunks";
 chunks:
   /* Chunks are contiguous series of declarations of the same type
@@ -346,18 +345,17 @@ chunks:
      They are held by a ChunkList, that can be empty, like in this case:
         let
         in
-            ..
+            .
         end
      which is why we end the recursion with a %empty. */
   %empty                  { $$ = make_ChunkList(@$); }
 | tychunk   chunks        { $$ = $2; $$->push_front($1); }
   // FIXED: Some code was deleted here (More rules).
 | funchunk chunks         { $$ = $2; $$->push_front($1); }
-| varchunk                { $$ = make_ChunkList(@$); $$->push_front($1); }
-//| "import" STRING   {$$ = TigerDriver::parse_import($2,@$)}// what to do with ? 
+| varchunk chunks         { $$ = $2; $$->push_front($1); }
+| "import" STRING         { $$ = td.parse_import($2,@$); }
 | CHUNKS "(" INT ")" chunks  { $$ = metavar<ast::ChunkList>(td, $3); $$->splice_back(*$5) ; }
 ;
-
 /*--------------------.
 | Type Declarations.  |
 `--------------------*/
@@ -396,7 +394,7 @@ tyfield_fun:
 ;
 
 varchunk:
-    vardec {$$ = make_VarChunk(@1); $$->push_front(*$1); };
+    vardec %prec CHUNKS { $$ = make_VarChunk(@1); $$->push_front(*$1); };
 ;
 
 vardec:

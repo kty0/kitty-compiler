@@ -9,14 +9,14 @@
 #include <type_traits>
 
 #include <ranges>
+#include <stack>
 #include <misc/algorithm.hh>
 #include <misc/contract.hh>
 #include <misc/indent.hh>
 
 namespace misc
 {
-  // FIXME: Some code was deleted here.
-
+  // FIXED: Some code was deleted here.
   template <typename Key, typename Data>
   inline std::ostream& operator<<(std::ostream& ostr,
                                   const scoped_map<Key, Data>& tbl)

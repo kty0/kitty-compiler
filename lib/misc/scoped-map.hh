@@ -13,20 +13,37 @@
 #pragma once
 
 #include <map>
+#include <stack>
 #include <vector>
 
 namespace misc
 {
-  template <typename Key, typename Data> class scoped_map
+  template <typename Data>
+  concept Is_pointer = requires(Data a)
   {
-    // FIXME: Some code was deleted here.
+    std::is_pointer<Data>(a) == true;
   };
 
+  template <typename Key, typename Data> class scoped_map
+  {
+    // FIXED: Some code was deleted here.
+
+  private:
+    std::stack<std::map<Key, Data>> stack{};
+
+  public:
+    scoped_map();
+    template <Is_pointer T> T get(Key key);
+    Data get(Key key);
+    void scope_begin();
+    void scope_end();
+    void put(Key val1, Data val2);
+  };
+
+  // FIXED: Some code was deleted here.
   template <typename Key, typename Data>
   std::ostream& operator<<(std::ostream& ostr,
                            const scoped_map<Key, Data>& tbl);
-
-  // FIXME: Some code was deleted here.
 
 } // namespace misc
 

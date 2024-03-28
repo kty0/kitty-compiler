@@ -32,8 +32,11 @@ namespace ast
 
     /** \name Accessors.
      ** \{ */
-    // FIXME: Some code was deleted here.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const Exp* def_get() const;
+    Exp* def_get();
+    // FIXED: Some code was deleted here.
+    void def_set(Exp*);
     /** \} */
 
   protected:

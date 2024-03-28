@@ -12,7 +12,10 @@
 namespace ast
 {
 
-  // FIXME: Some code was deleted here.
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+  inline const Exp* BreakExp::def_get() const { return def_; }
+  inline Exp* BreakExp::def_get() { return def_; }
+  // FIXED: Some code was deleted here.
+  inline void BreakExp::def_set(Exp* def) { def_ = def; }
 
 } // namespace ast

@@ -23,6 +23,10 @@ namespace object::tasks
                object_parse,
                "object parse");
 
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+  TASK_DECLARE("object-bindings-compute",
+               "compute the bindings in the AST for the object part",
+               object_bindings_compute,
+               "parse");
 
 } // namespace object::tasks

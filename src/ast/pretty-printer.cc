@@ -18,9 +18,8 @@ namespace ast
     /// Output \a e on \a ostr.
     inline std::ostream& operator<<(std::ostream& ostr, const Escapable& e)
     {
-      if (escapes_display(ostr)
-          // FIXME: Some code was deleted here.
-      )
+      if (escapes_display(ostr))
+        // IGNORED: Some code was deleted here.
         ostr << "/* escaping */ ";
 
       return ostr;
@@ -86,27 +85,34 @@ namespace ast
   }
 
   /* break */
-  void PrettyPrinter::operator()(const BreakExp& e) { ostr_ << "break"; }
+  void PrettyPrinter::operator()(const BreakExp& e)
+  {
+    ostr_ << "break";
+    if (bindings_display(ostr_))
+      ostr_ << " /* " << e.def_get() << " */";
+  }
 
   /* myfunc(a, b, c) */
   void PrettyPrinter::operator()(const CallExp& e)
   {
-    ostr_ << e.name_get() << "(";
-
+    ostr_ << e.name_get();
+    if (bindings_display(ostr_))
+      ostr_ << " /* " << e.def_get() << " */";
+    ostr_ << "(";
     const exps_type& args = e.args_get();
     ostr_ << misc::separate(args, ", ");
-
     ostr_ << ")";
   }
 
   /* myobj.myfunc(a, b, c) */
   void PrettyPrinter::operator()(const MethodCallExp& e)
   {
-    ostr_ << e.object_get() << '.' << e.name_get() << "(";
-
+    ostr_ << e.object_get() << '.' << e.name_get();
+    if (bindings_display(ostr_))
+      ostr_ << " /* " << e.def_get() << " */";
+    ostr_ << "(";
     const exps_type& args = e.args_get();
     ostr_ << misc::separate(args, ", ");
-
     ostr_ << ")";
   }
 
@@ -116,9 +122,13 @@ namespace ast
   void PrettyPrinter::operator()(const ForExp& e)
   {
     const VarDec& var = e.vardec_get();
-    ostr_ << "for " << var.name_get() << " := " << var.init_get() << " to "
-          << e.hi_get() << " do" << misc::incendl << e.body_get()
-          << misc::decindent;
+    ostr_ << "for ";
+    if (bindings_display(ostr_))
+      {
+        ostr_ << " /* " << &e << " */";
+      }
+    ostr_ << var.name_get() << " := " << *var.init_get() << " to " << e.hi_get()
+          << " do" << misc::incendl << e.body_get() << misc::decindent;
   }
 
   /* while false do
@@ -126,7 +136,12 @@ namespace ast
    */
   void PrettyPrinter::operator()(const WhileExp& e)
   {
-    ostr_ << "while " << e.test_get() << " do" << misc::incendl << e.body_get()
+    ostr_ << "while ";
+    if (bindings_display(ostr_))
+      {
+        ostr_ << " /*" << &e << " */";
+      }
+    ostr_ << e.test_get() << " do" << misc::incendl << e.body_get()
           << misc::decindent;
   }
 
@@ -148,7 +163,14 @@ namespace ast
 
   void PrettyPrinter::operator()(const ClassTy& e) { ostr_ << e.super_get(); }
 
-  void PrettyPrinter::operator()(const NameTy& e) { ostr_ << e.name_get(); }
+  void PrettyPrinter::operator()(const NameTy& e)
+  {
+    ostr_ << e.name_get();
+    if (bindings_display(ostr_))
+      {
+        ostr_ << "/* " << &e << " */";
+      }
+  }
 
   void PrettyPrinter::operator()(const RecordTy& e)
   {
@@ -180,8 +202,13 @@ namespace ast
        exp */
   void PrettyPrinter::operator()(const FunctionDec& e)
   {
-    ostr_ << "function " << e.name_get() << '(';
-
+    ostr_ << ((e.body_get() == nullptr) ? "primitive " : "function ")
+          << e.name_get();
+    if (bindings_display(ostr_))
+      {
+        ostr_ << "/* " << &e << " */";
+      }
+    ostr_ << '(';
     const VarChunk& formals = e.formals_get();
     if (!formals.empty())
       {
@@ -197,6 +224,7 @@ namespace ast
     ostr_ << ')';
 
     const NameTy* result = e.result_get();
+
     if (result != nullptr)
       {
         ostr_ << " : " << result->name_get();
@@ -213,14 +241,22 @@ namespace ast
 
   void PrettyPrinter::operator()(const TypeDec& e)
   {
-    ostr_ << "type " << e.name_get() << " = " << e.ty_get();
+    ostr_ << "type " << e.name_get();
+    if (bindings_display(ostr_))
+      {
+        ostr_ << "/* " << &e << " */";
+      }
+    ostr_ << " = " << e.ty_get();
   }
 
   /* var x := 42 */
   void PrettyPrinter::operator()(const VarDec& e)
   {
     ostr_ << "var " << e.name_get();
-
+    if (bindings_display(ostr_))
+      {
+        ostr_ << "/* " << &e << " */";
+      }
     const NameTy* type_name = e.type_name_get();
     if (type_name != nullptr)
       {
@@ -283,14 +319,20 @@ namespace ast
         ostr_ << "()";
         return;
       }
+    else if (e.exps_get().size() == 1)
+      {
+        std::vector<Exp*> exp = e.exps_get();
+        ostr_ << **exp.begin();
+        return;
+      }
 
     std::vector<Exp*> exps = e.exps_get();
 
     ostr_ << '(' << misc::incendl << **exps.begin();
     for (auto it = exps.begin() + 1; it != exps.end(); it++)
-    {
-      ostr_ << ';' << misc::iendl << *(*it);
-    }
+      {
+        ostr_ << ';' << misc::iendl << *(*it);
+      }
     ostr_ << misc::decendl << ')';
   }
 

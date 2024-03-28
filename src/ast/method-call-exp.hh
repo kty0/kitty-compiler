@@ -49,8 +49,11 @@ namespace ast
     const Var& object_get() const;
     /// Return the object on which the method is called.
     Var& object_get();
-    // FIXME: Some code was deleted here.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const MethodDec* def_get() const;
+    MethodDec* def_get();
+    // FIXED: Some code was deleted here.
+    void def_set(MethodDec*);
     /** \} */
 
   protected:

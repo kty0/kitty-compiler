@@ -16,7 +16,10 @@ namespace ast
   inline const exps_type& CallExp::args_get() const { return *args_; }
   inline exps_type& CallExp::args_get() { return *args_; }
 
-  // FIXME: Some code was deleted here.
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+  inline const FunctionDec* CallExp::def_get() const { return def_; }
+  inline FunctionDec* CallExp::def_get() { return def_; }
+  // FIXED: Some code was deleted here.
+  inline void CallExp::def_set(FunctionDec* def) { def_ = def; }
 
 } // namespace ast

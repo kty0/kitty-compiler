@@ -56,6 +56,8 @@ namespace ast
     void operator()(const ast::RecordExp& e) override;
     void operator()(const ast::SeqExp& e) override;
     void operator()(const ast::StringExp& e) override;
+    void operator()(const ast::FunctionChunk& e) override;
+    void operator()(const ast::TypeChunk& e) override;
     /// \}
 
   private:

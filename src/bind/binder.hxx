@@ -3,4 +3,4 @@
  ** \brief Inline methods of bind::Binder.
  **/
 
-// FIXME: Some code was deleted here.
+// FIXED: Some code was deleted here.

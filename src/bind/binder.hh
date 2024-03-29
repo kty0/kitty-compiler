@@ -7,6 +7,8 @@
 
 #include <unordered_map>
 
+#include <stack>
+#include <tuple>
 #include <ast/default-visitor.hh>
 #include <ast/object-visitor.hh>
 
@@ -47,6 +49,9 @@ namespace bind
     , public ast::ObjectVisitor
   {
   public:
+    // using for tuple
+    using binding_tuples =
+      std::tuple<ast::FunctionDec*, ast::VarDec*, ast::TypeDec*>;
     /// Super class type.
     using super_type = ast::DefaultVisitor;
     /// Import all the overloaded \c operator() methods.
@@ -56,7 +61,13 @@ namespace bind
     const misc::error& error_get() const;
 
     /* The visiting methods. */
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    void operator()(ast::ForExp& e) override;
+    void operator()(ast::WhileExp& e) override;
+    void operator()(ast::SimpleVar& e) override;
+    void operator()(ast::CallExp& e) override;
+    void operator()(ast::RecordExp& e) override;
+    void operator()(ast::BreakExp& e) override;
 
     // ---------------- //
     // Visiting /Dec/.  //
@@ -77,14 +88,21 @@ namespace bind
     /// second step, we process the contents of all the functions
     /// belonging to the current chunk.
 
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    void operator()(ast::FunctionDec& e) override;
+    void operator()(ast::TypeDec& e) override;
+    void operator()(ast::VarDec& e) override;
     /// \}
 
   protected:
     /// Binding errors handler.
     misc::error error_;
 
-    // FIXME: Some code was deleted here (More members).
+    // FIXED: Some code was deleted here (More members).
+    // Scoped map to save bindings address
+    misc::scoped_map<const std::string, binding_tuples> sm;
+    // Stack to save for and while nodes
+    std::stack<ast::Exp*> break_stack;
   };
 
 } // namespace bind

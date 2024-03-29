@@ -54,13 +54,11 @@ namespace misc
         throw std::invalid_argument("no scope begin");
       }
     auto map = stack.top();
-    stack.pop();
     auto it = map.find(key);
     if (it == map.end())
       {
         throw std::invalid_argument("invalid key");
       }
-    stack.push(map);
     return (*it).second;
   }
 
@@ -74,9 +72,7 @@ namespace misc
         return;
       }
     std::map<Key, Data> map_ = stack.top();
-    stack.pop();
     std::map<Key, Data> map(map_);
-    stack.push(map_);
     stack.push(map);
   }
 

@@ -29,13 +29,16 @@ namespace ast
     ///
     /// Used to factor the output of the name declared,
     /// and its possible additional attributes.
+    /*
+     * REMOVED THIS BECAUSE WE FOUND IT USELESS
     inline std::ostream& operator<<(std::ostream& ostr, const Dec& e)
     {
       ostr << e.name_get();
       if (bindings_display(ostr))
-        ostr << " /* " << &e << " */";
+        ostr << " \/* " << &e << " *\/";
       return ostr;
     }
+    */
   } // namespace
 
   PrettyPrinter::PrettyPrinter(std::ostream& ostr)
@@ -125,10 +128,15 @@ namespace ast
     ostr_ << "for ";
     if (bindings_display(ostr_))
       {
-        ostr_ << " /* " << &e << " */";
+        ostr_ << " /* " << &e << " */ ";
       }
-    ostr_ << var.name_get() << " := " << *var.init_get() << " to " << e.hi_get()
-          << " do" << misc::incendl << e.body_get() << misc::decindent;
+    ostr_ << var.name_get();
+    if (bindings_display(ostr_))
+      {
+        ostr_ << " /* " << &var << " */";
+      }
+    ostr_ << " := " << *var.init_get() << " to " << e.hi_get() << " do"
+          << misc::incendl << e.body_get() << misc::decindent;
   }
 
   /* while false do
@@ -139,7 +147,7 @@ namespace ast
     ostr_ << "while ";
     if (bindings_display(ostr_))
       {
-        ostr_ << " /*" << &e << " */";
+        ostr_ << "/* " << &e << " */ ";
       }
     ostr_ << e.test_get() << " do" << misc::incendl << e.body_get()
           << misc::decindent;
@@ -168,7 +176,7 @@ namespace ast
     ostr_ << e.name_get();
     if (bindings_display(ostr_))
       {
-        ostr_ << "/* " << &e << " */";
+        ostr_ << " /* " << e.def_get() << " */";
       }
   }
 
@@ -186,10 +194,50 @@ namespace ast
   /*
    * var a := 0
    * var b := 0
+   *
+   * type t = {}
+   *
+   * function f() = 42
    */
   void PrettyPrinter::operator()(const ChunkList& e)
   {
     ostr_ << misc::separate(e.chunks_get(), misc::iendl);
+  }
+
+  /*
+   * type a = {}
+   * type b = {}
+   */
+  void PrettyPrinter::operator()(const ast::TypeChunk& e)
+  {
+    if (e.empty())
+      {
+        return;
+      }
+
+    ostr_ << **e.begin();
+    for (auto it = e.begin() + 1; it != e.end(); it++)
+      {
+        ostr_ << misc::iendl << **it;
+      }
+  }
+
+  /*
+   * function f() = 42
+   * function g() : int = 2508
+   */
+  void PrettyPrinter::operator()(const ast::FunctionChunk& e)
+  {
+    if (e.empty())
+      {
+        return;
+      }
+
+    ostr_ << **e.begin();
+    for (auto it = e.begin() + 1; it != e.end(); it++)
+      {
+        ostr_ << misc::iendl << **it;
+      }
   }
 
   /* x = 5 */
@@ -206,7 +254,7 @@ namespace ast
           << e.name_get();
     if (bindings_display(ostr_))
       {
-        ostr_ << "/* " << &e << " */";
+        ostr_ << " /* " << &e << " */";
       }
     ostr_ << '(';
     const VarChunk& formals = e.formals_get();
@@ -232,7 +280,6 @@ namespace ast
 
     if (e.body_get() == nullptr)
       {
-        ostr_ << misc::iendl;
         return;
       }
 
@@ -244,7 +291,7 @@ namespace ast
     ostr_ << "type " << e.name_get();
     if (bindings_display(ostr_))
       {
-        ostr_ << "/* " << &e << " */";
+        ostr_ << " /* " << &e << " */";
       }
     ostr_ << " = " << e.ty_get();
   }
@@ -255,7 +302,7 @@ namespace ast
     ostr_ << "var " << e.name_get();
     if (bindings_display(ostr_))
       {
-        ostr_ << "/* " << &e << " */";
+        ostr_ << " /* " << &e << " */";
       }
     const NameTy* type_name = e.type_name_get();
     if (type_name != nullptr)

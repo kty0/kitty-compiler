@@ -20,7 +20,7 @@ namespace bind::tasks
     misc::error result = bind::bind(*ast::tasks::the_program);
 
     task_error() << result;
-    if (!result)
+    if (result)
       task_error().exit();
   }
 

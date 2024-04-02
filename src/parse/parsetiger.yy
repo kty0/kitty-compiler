@@ -306,12 +306,12 @@ exp:
 
 empty_type:
     %empty {$$ = make_fieldinits_type();}
-    | ID "=" exp empty_type_2 { $$ = $4; $$->emplace_back(make_FieldInit(@$,$1,$3));}
+    | ID "=" exp empty_type_2 { $$ = $4; $$->insert($$->begin(), make_FieldInit(@$,$1,$3));}
     ;
 
 empty_type_2:
     %empty {$$ = make_fieldinits_type();}
-    | "," ID "=" exp empty_type_2 { $$ = $5; $$->emplace_back(make_FieldInit(@$,$2,$4));}
+    | "," ID "=" exp empty_type_2 { $$ = $5; $$->insert($$->begin(), make_FieldInit(@$,$2,$4));}
     ;
 
 extra_exp_1:
@@ -321,7 +321,7 @@ extra_exp_1:
 
 extra_exp_2:
     %empty { $$ = make_exps_type(); }
-    | "," exp extra_exp_2 { $$ = $3; $$->emplace_back($2); }
+    | "," exp extra_exp_2 { $$ = $3; $$->insert($$->begin(), $2); }
     ;
 
 lvalue:

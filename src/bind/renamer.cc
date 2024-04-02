@@ -4,7 +4,7 @@
  */
 
 #include <bind/renamer.hh>
-#include "misc/symbol.hh"
+#include <misc/symbol.hh>
 
 namespace bind
 {

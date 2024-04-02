@@ -7,9 +7,9 @@
 
 #include <iostream>
 #include <map>
+#include <ast/all.hh>
 #include <ast/default-visitor.hh>
 #include <ast/non-object-visitor.hh>
-#include <ast/all.hh>
 
 namespace bind
 {
@@ -26,7 +26,6 @@ namespace bind
     using super_type::operator();
 
     // FIXED: Some code was deleted here.
-
 
     // Visit methods.
     /// \brief Process a declaration body or a usage site.

@@ -188,7 +188,7 @@ namespace ast
   /* a : int */
   void PrettyPrinter::operator()(const Field& e)
   {
-    ostr_ << e.type_name_get() << " : " << e.name_get();
+    ostr_ << e.name_get() << " : " << e.type_name_get();
   }
 
   /*
@@ -260,12 +260,26 @@ namespace ast
     const VarChunk& formals = e.formals_get();
     if (!formals.empty())
       {
-        ostr_ << (*formals.begin())->name_get() << " : "
-              << *(*formals.begin())->type_name_get();
-        for (auto it = formals.begin() + 1; it != formals.end(); it++)
+        if (bindings_display(ostr_))
           {
-            ostr_ << ", " << (*it)->name_get() << " : "
-                  << *(*it)->type_name_get();
+            ostr_ << (*formals.begin())->name_get() << " /* "
+                  << (*formals.begin()) << " */"
+                  << " : " << *(*formals.begin())->type_name_get();
+            for (auto it = formals.begin() + 1; it != formals.end(); it++)
+              {
+                ostr_ << ", " << (*it)->name_get() << " /* " << (*it) << " */"
+                      << " : " << *(*it)->type_name_get();
+              }
+          }
+        else
+          {
+            ostr_ << (*formals.begin())->name_get() << " : "
+                  << *(*formals.begin())->type_name_get();
+            for (auto it = formals.begin() + 1; it != formals.end(); it++)
+              {
+                ostr_ << ", " << (*it)->name_get() << " : "
+                      << *(*it)->type_name_get();
+              }
           }
       }
 
@@ -275,7 +289,15 @@ namespace ast
 
     if (result != nullptr)
       {
-        ostr_ << " : " << result->name_get();
+        if (bindings_display(ostr_))
+          {
+            ostr_ << " : " << result->name_get() << " /* " << result->def_get()
+                  << " */";
+          }
+        else
+          {
+            ostr_ << " : " << result->name_get();
+          }
       }
 
     if (e.body_get() == nullptr)
@@ -307,7 +329,7 @@ namespace ast
     const NameTy* type_name = e.type_name_get();
     if (type_name != nullptr)
       {
-        ostr_ << ": " << type_name;
+        ostr_ << ": " << *type_name;
       }
 
     ostr_ << " := " << *e.init_get();

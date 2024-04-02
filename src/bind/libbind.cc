@@ -7,6 +7,7 @@
 #include <ast/fwd.hh>
 #include <bind/binder.hh>
 #include <bind/libbind.hh>
+#include <bind/renamer.hh>
 #include <misc/error.hh>
 
 namespace bind
@@ -16,5 +17,11 @@ namespace bind
     Binder binder;
     binder(tree);
     return binder.error_get();
+  }
+
+  void rename(ast::Ast& tree)
+  {
+    Renamer renamer;
+    renamer(tree);
   }
 } // namespace bind

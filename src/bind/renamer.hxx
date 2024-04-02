@@ -9,10 +9,10 @@
 
 namespace bind
 {
-  // FIXME: Some code was deleted here.
+  // IGNORED: Some code was deleted here.
 
   template <class E, class Def> void Renamer::visit(E& e, const Def* def)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 } // namespace bind

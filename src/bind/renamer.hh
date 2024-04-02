@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <iostream>
+#include <map>
 #include <ast/default-visitor.hh>
 #include <ast/non-object-visitor.hh>
+#include <ast/all.hh>
 
 namespace bind
 {
@@ -22,7 +25,8 @@ namespace bind
     // Import overloaded virtual functions.
     using super_type::operator();
 
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+
 
     // Visit methods.
     /// \brief Process a declaration body or a usage site.
@@ -33,16 +37,26 @@ namespace bind
 
     /// \name Visiting definition sites.
     /// \{
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    void operator()(ast::TypeDec& e) override;
+    void operator()(ast::FunctionDec& e) override;
+    void operator()(ast::VarDec& e) override;
+    void operator()(ast::MethodDec& e) override;
     /// \}
 
     /// \name Visiting usage sites.
     /// \{
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    void operator()(ast::SimpleVar& e) override;
+    void operator()(ast::NameTy& e) override;
+    void operator()(ast::CallExp& e) override;
+    void operator()(ast::MethodCallExp& e) override;
     /// \}
 
   private:
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    int count = 0;
+    std::map<ast::Dec*, std::string> map;
   };
 
 } // namespace bind

@@ -7,6 +7,7 @@
 #include <bind/libbind.hh>
 #include <common.hh>
 #include <misc/error.hh>
+#include <common.hh>
 #include <object/libobject.hh>
 #define DEFINE_TASKS 1
 #include <object/tasks.hh>
@@ -24,6 +25,12 @@ namespace object::tasks
     task_error() << result;
     if (!result)
       task_error().exit();
+  }
+
+  void object_types_compute()
+  {
+    task_error() << ::object::types_check(*ast::tasks::the_program)
+                 << &misc::error::exit_on_error;
   }
 
 } // namespace object::tasks

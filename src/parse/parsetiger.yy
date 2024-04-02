@@ -120,6 +120,7 @@
       parse::Tweast* input = td.input_;
       return input->template take<T>(key);
     }
+
   }
 }
 
@@ -337,6 +338,7 @@ lvalue:
 /*---------------.
 | Declarations.  |
 `---------------*/
+
 %token CHUNKS "_chunks";
 chunks:
   /* Chunks are contiguous series of declarations of the same type
@@ -345,7 +347,7 @@ chunks:
      They are held by a ChunkList, that can be empty, like in this case:
         let
         in
-            .
+            ..
         end
      which is why we end the recursion with a %empty. */
   %empty                  { $$ = make_ChunkList(@$); }

@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <ast/fwd.hh>
+
 #include <misc/map.hh>
 #include <misc/symbol.hh>
 #include <parse/metavar-map.hh>

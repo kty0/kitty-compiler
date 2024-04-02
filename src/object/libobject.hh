@@ -15,7 +15,7 @@ namespace object
   | Bind.  |
   `-------*/
 
-  // FIXME: Some code was deleted here.
+  // IGNORED: Some code was deleted here.
 
 } // namespace object
 

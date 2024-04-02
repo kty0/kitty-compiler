@@ -68,6 +68,7 @@ namespace bind
     void operator()(ast::CallExp& e) override;
     void operator()(ast::RecordExp& e) override;
     void operator()(ast::BreakExp& e) override;
+    void operator()(ast::NameTy& e) override;
 
     // ---------------- //
     // Visiting /Dec/.  //

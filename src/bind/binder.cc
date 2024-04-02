@@ -44,16 +44,20 @@ namespace bind
         this->sm.put(e.name_get(), {&e, nullptr, nullptr});
       }
 
-    this->sm.scope_begin();   // open the scope
+    this->sm.scope_begin(); // open the scope
+
     (*this)(e.formals_get()); // visit
+
     if (e.result_get() != nullptr)
       {
         (*this)(e.result_get()); // visit
       }
+
     if (e.body_get() != nullptr)
       {
         (*this)(e.body_get()); // visit
       }
+
     this->sm.scope_end(); // close the scope
   }
 
@@ -100,11 +104,11 @@ namespace bind
       {
         this->sm.put(e.name_get(), {nullptr, &e, nullptr});
       }
+
     if (e.type_name_get() != nullptr)
       {
         (*this)(e.type_name_get());
       }
-
     if (e.init_get() != nullptr)
       {
         (*this)(e.init_get());
@@ -201,6 +205,35 @@ namespace bind
         this->error_ << misc::error::error_type::bind << e.location_get()
                      << ": bind error, undeclared type "
                      << e.type_name_get().name_get() << "\n";
+      }
+  }
+
+  void Binder::operator()(ast::NameTy& e)
+  {
+    if (e.name_get() == "int" || e.name_get() == "string")
+      {
+        return;
+      }
+
+    try
+      {
+        auto t = this->sm.get(e.name_get());
+
+        ast::TypeDec* def = GETTYPE;
+        if (def == nullptr)
+          {
+            this->error_ << misc::error::error_type::bind << e.location_get()
+                         << ": bind error, undeclared type " << e.name_get()
+                         << "\n";
+          }
+
+        e.def_set(def);
+      }
+    catch (std::invalid_argument& er)
+      {
+        this->error_ << misc::error::error_type::bind << e.location_get()
+                     << ": bind error, undeclared type " << e.name_get()
+                     << "\n";
       }
   }
 

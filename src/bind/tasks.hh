@@ -20,15 +20,10 @@ namespace bind::tasks
   TASK_DECLARE("B|bindings-display",
                "display the result of the bindings in the pretty printer",
                bindings_display,
-               "bound");
+               "bindings-compute");
 
   DISJUNCTIVE_TASK_DECLARE("bound",
                            "chooses whether to launch object or normal binding",
                            "bindings-compute object-bindings-compute");
-
-  TASK_DECLARE("rename",
-               "rename the identifiers so that they are all unique",
-               rename,
-               "bound");
 
 } //namespace bind::tasks

@@ -12,6 +12,4 @@
 namespace bind
 {
   misc::error bind(ast::Ast& tree);
-
-  void rename(ast::Ast& tree);
 }

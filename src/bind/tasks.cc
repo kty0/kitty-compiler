@@ -25,6 +25,4 @@ namespace bind::tasks
   }
 
   void bindings_display() { ast::bindings_display(std::cout) = true; }
-
-  void rename() { bind::rename(*ast::tasks::the_program); }
 } // namespace bind::tasks

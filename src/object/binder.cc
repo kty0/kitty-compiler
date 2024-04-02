@@ -25,13 +25,13 @@ namespace object
 
   void Binder::operator()(ast::SimpleVar& e)
   {
-    // IGNORED: Some code was deleted here.
+    // FIXME: Some code was deleted here.
   }
 
   // Handle the case of `Object'.
   void Binder::operator()(ast::NameTy& e)
   {
-    // IGNORED: Some code was deleted here.
+    // FIXME: Some code was deleted here.
   }
 
   /*---------------.
@@ -52,7 +52,7 @@ namespace object
 
   void Binder::operator()(ast::ClassTy& e)
   {
-    // IGNORED: Some code was deleted here (Scope begins).
+    // FIXME: Some code was deleted here (Scope begins).
     e.super_get().accept(*this);
     bool saved_within_class_ty = within_class_ty_;
     within_class_ty_ = true;
@@ -61,7 +61,7 @@ namespace object
     e.chunks_get().accept(*this);
     within_method_dec_ = saved_within_method_dec;
     within_class_ty_ = saved_within_class_ty;
-    // IGNORED: Some code was deleted here (Scope ends).
+    // FIXME: Some code was deleted here (Scope ends).
   }
 
   /*---------------.
@@ -95,7 +95,7 @@ namespace object
   {
     // Shorthand.
     using chunk_type = ast::Chunk<D>;
-    // IGNORED: Some code was deleted here (Two passes: once on headers, then on bodies).
+    // FIXME: Some code was deleted here (Two passes: once on headers, then on bodies).
   }
 
   // This trampoline is needed, since `virtual' and `template' cannot
@@ -103,7 +103,7 @@ namespace object
   template <>
   void Binder::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e)
   {
-    // IGNORED: Some code was deleted here (Call the super type).
+    // FIXME: Some code was deleted here (Call the super type).
   }
 
   // Compute the bindings of this function's body.
@@ -113,7 +113,7 @@ namespace object
     within_class_ty_ = false;
     bool saved_within_method_dec = within_method_dec_;
     within_method_dec_ = false;
-    // IGNORED: Some code was deleted here (Call the super type).
+    // FIXME: Some code was deleted here (Call the super type).
     within_method_dec_ = saved_within_method_dec;
     within_class_ty_ = saved_within_class_ty;
   }
@@ -127,7 +127,7 @@ namespace object
      bind::Binder does for functions for instance).  */
   void Binder::operator()(ast::MethodDec& e)
   {
-    // IGNORED: Some code was deleted here (Scope begins).
+    // FIXME: Some code was deleted here (Scope begins).
     bool saved_within_class_ty = within_class_ty_;
     within_class_ty_ = false;
     bool saved_within_method_dec = within_method_dec_;
@@ -138,7 +138,7 @@ namespace object
     within_method_dec_ = saved_within_method_dec;
     within_class_ty_ = saved_within_class_ty;
     overrided_self_ = saved_overrided_self;
-    // IGNORED: Some code was deleted here (Scope ends).
+    // FIXME: Some code was deleted here (Scope ends).
   }
 
 } // namespace object

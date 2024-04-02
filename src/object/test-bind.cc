@@ -16,7 +16,7 @@ inline static bool bound(const std::string& s)
 {
   ast::ChunkList* d = parse::parse_unit(s, true);
   misc::error e;
-  // IGNORED: Some code was deleted here (Run the object binder).
+  // FIXME: Some code was deleted here (Run the object binder).
   std::cout << *d << '\n';
   if (e)
     std::cerr << "error-->" << e << '\n';

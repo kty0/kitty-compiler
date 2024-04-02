@@ -316,7 +316,7 @@ empty_type_2:
 
 extra_exp_1:
     %empty { $$ = make_exps_type(); }
-    | exp extra_exp_2 { $$ = $2; $$->insert($$->begin(), $1); }
+    | exp extra_exp_2 { $$ = $2; $$->emplace_back($1); }
     ;
 
 extra_exp_2:

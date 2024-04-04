@@ -8,5 +8,10 @@
 
 namespace ast
 {
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+
+  type::Type* Typable::get_type() { return type_; }
+
+  void Typable::set_type(type::Type* type) { type_ = type; }
+
 } // namespace ast

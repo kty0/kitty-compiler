@@ -16,7 +16,16 @@ namespace ast
 
   class TypeConstructor
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+  public:
+    TypeConstructor() = default;
+    ~TypeConstructor();
+
+    void created_type_set(type::Type*);
+    type::Type* created_type_get();
+
+  private:
+    type::Type* instance_;
   };
 } // namespace ast
 #include <ast/type-constructor.hxx>

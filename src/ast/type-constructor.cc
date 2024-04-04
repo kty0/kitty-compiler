@@ -8,5 +8,12 @@
 
 namespace ast
 {
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+
+  TypeConstructor::~TypeConstructor() { delete instance_; }
+
+  void TypeConstructor::created_type_set(type::Type* type) { instance_ = type; }
+
+  type::Type* TypeConstructor::created_type_get() { return instance_; }
+
 } // namespace ast

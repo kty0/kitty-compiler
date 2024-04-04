@@ -222,7 +222,7 @@
 // a unique TypeDec each, or a single TypeChunk containing two TypeDec.
 // We want the latter.
 %precedence CHUNKS
-%precedence "primitive" "function"
+%precedence "primitive" "function" "class"
 %precedence TYPE
 // FIXED: Some code was deleted here (Other declarations).
 %precedence UNARY
@@ -303,6 +303,12 @@ exp:
   | CAST "(" exp "," ty ")" { $$ = make_CastExp(@$, $3, $5); }
   /* an expression metavariable */
   | EXP "(" INT ")" { $$ = metavar<ast::Exp>(td, $3); }
+
+  /* Object creation */
+  |"new" typeid
+
+  /* Method call */
+  | lvalue "." ID "(" method_rule ")"
   ;
 
 empty_type:
@@ -334,6 +340,15 @@ lvalue:
     /* a l-value metavariable */
     | LVALUE "(" INT ")" { $$ = metavar<ast::Var>(td, $3); }
     ;
+
+method_rule:
+    %empty
+    | exp method_rule_2
+    ;
+
+method_rule_2:
+    %empty
+    | "," exp method_rule_2
 
 /*---------------.
 | Declarations.  |
@@ -410,13 +425,32 @@ fundecbis:
 
 tydec:
   "type" ID "=" ty { $$ = make_TypeDec(@$, $2, $4); }
-;
+  /* Class definition (alternative form) */
+  | "class" ID extends_rule "{" classfields "}"
+  ;
 
 ty:
-  ID                   { $$ = make_NameTy(@$, $1); }
-| "{" tyfields "}"     { $$ = make_RecordTy(@$, $2); }
-| "array" "of" typeid  { $$ = make_ArrayTy(@$, $3); }
-;
+    ID                     { $$ = make_NameTy(@$, $1); }
+    | "{" tyfields "}"     { $$ = make_RecordTy(@$, $2); }
+    | "array" "of" typeid  { $$ = make_ArrayTy(@$, $3); }
+    /* Class definition (canonical form) */
+    | "class" extends_rule "{" classfields "}"
+    ;
+
+extends_rule:
+    %empty
+    | "extends" typeid
+    ;
+
+/* Class field */
+classfields:
+    %empty
+    /* Attribute declaration (varchunk) */
+    |varchunk classfields
+    /* Method declaration (methchunk) */
+    | "method" ID "(" tyfields ")" "=" exp
+    | "method" ID "(" tyfields ")" ":" typeid"=" exp
+    ;
 
 tyfields:
   %empty               { $$ = make_fields_type(); }

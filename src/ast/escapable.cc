@@ -16,4 +16,5 @@ namespace ast
   }
   void Escapable::set_unescaped() { this->escaped = false; }
   bool Escapable::is_locked() const { return locked; }
+  bool Escapable::is_escaped() const { return escaped; }
 } // namespace ast

@@ -18,6 +18,7 @@ namespace ast
     void set_escaped();
     void set_unescaped();
     bool is_locked() const;
+    bool is_escaped() const;
 
   private:
     // FIXED: Some code was deleted here.

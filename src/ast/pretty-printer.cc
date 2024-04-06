@@ -16,12 +16,13 @@ namespace ast
   // Anonymous namespace: these functions are private to this file.
   namespace
   {
+    /*
     /// Output \a e on \a ostr.
     inline std::ostream& operator<<(std::ostream& ostr, const Escapable& e)
     {
       if (escapes_display(ostr))
-        // IGNORED: Some code was deleted here.
-        ostr << "/* escaping */ ";
+        // FIXED: Some code was deleted here.
+        ostr << "\/* escaping *\/ ";
 
       return ostr;
     }
@@ -30,8 +31,7 @@ namespace ast
     ///
     /// Used to factor the output of the name declared,
     /// and its possible additional attributes.
-    /*
-     * REMOVED THIS BECAUSE WE FOUND IT USELESS
+    /// REMOVED THIS BECAUSE WE FOUND IT USELESS
     inline std::ostream& operator<<(std::ostream& ostr, const Dec& e)
     {
       ostr << e.name_get();
@@ -130,6 +130,10 @@ namespace ast
     if (bindings_display(ostr_))
       {
         ostr_ << " /* " << &e << " */ ";
+      }
+    if (escapes_display(ostr_) && var.is_escaped())
+      {
+        ostr_ << "/* escaping */ ";
       }
     ostr_ << var.name_get();
     if (bindings_display(ostr_))
@@ -263,21 +267,37 @@ namespace ast
       {
         if (bindings_display(ostr_))
           {
+            if (escapes_display(ostr_) && (*formals.begin())->is_escaped())
+            {
+              ostr_ << "/* escaping */ ";
+            }
             ostr_ << (*formals.begin())->name_get() << " /* "
                   << (*formals.begin()) << " */"
                   << " : " << *(*formals.begin())->type_name_get();
             for (auto it = formals.begin() + 1; it != formals.end(); it++)
               {
+                if (escapes_display(ostr_) && (*it)->is_escaped())
+                {
+                  ostr_ << "/* escaping */ ";
+                }
                 ostr_ << ", " << (*it)->name_get() << " /* " << (*it) << " */"
                       << " : " << *(*it)->type_name_get();
               }
           }
         else
           {
+            if (escapes_display(ostr_) && (*formals.begin())->is_escaped())
+            {
+              ostr_ << "/* escaping */ ";
+            }
             ostr_ << (*formals.begin())->name_get() << " : "
                   << *(*formals.begin())->type_name_get();
             for (auto it = formals.begin() + 1; it != formals.end(); it++)
               {
+                if (escapes_display(ostr_) && (*it)->is_escaped())
+                {
+                  ostr_ << "/* escaping */ ";
+                }
                 ostr_ << ", " << (*it)->name_get() << " : "
                       << *(*it)->type_name_get();
               }
@@ -322,7 +342,12 @@ namespace ast
   /* var x := 42 */
   void PrettyPrinter::operator()(const VarDec& e)
   {
-    ostr_ << "var " << e.name_get();
+    ostr_ << "var ";
+    if (escapes_display(ostr_) && e.is_escaped())
+      {
+        ostr_ << "/* escaping */ ";
+      }
+    ostr_ << e.name_get();
     if (bindings_display(ostr_))
       {
         ostr_ << " /* " << &e << " */";

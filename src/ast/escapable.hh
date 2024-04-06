@@ -12,7 +12,17 @@ namespace ast
   /// Escapable.
   class Escapable
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+
+  public:
+    void set_escaped();
+    void set_unescaped();
+    bool is_locked() const;
+
+  private:
+    // FIXED: Some code was deleted here.
+    bool escaped = true; // by default, variables are escaped
+    bool locked = false;
   };
 } // namespace ast
 #include <ast/escapable.hxx>

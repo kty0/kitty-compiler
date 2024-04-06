@@ -8,5 +8,12 @@
 
 namespace ast
 {
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+  void Escapable::set_escaped()
+  {
+    this->escaped = true;
+    this->locked = true;
+  }
+  void Escapable::set_unescaped() { this->escaped = false; }
+  bool Escapable::is_locked() const { return locked; }
 } // namespace ast

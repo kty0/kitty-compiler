@@ -9,5 +9,5 @@
 
 namespace ast
 {
-  // FIXME: Some code was deleted here.
+  // IGNORED: Some code was deleted here. Nothing to add here.
 } // namespace ast

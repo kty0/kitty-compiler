@@ -23,6 +23,7 @@ namespace bind
   const misc::error& Binder::error_get() const { return error_; }
 
   // FIXED: Some code was deleted here.
+
   void Binder::operator()(ast::FunctionDec& e)
   {
     try
@@ -247,6 +248,18 @@ namespace bind
       }
     e.def_set(brk);
     break_stack.pop();
+  }
+  void Binder::operator()(ast::LetExp& e)
+  {
+    sm.scope_begin();
+    // visit ChunkList
+    for (auto& it : e.chunks_get())
+      {
+        (*this)(it);
+      }
+    // visit the body
+    (*this)(e.body_get());
+    sm.scope_end();
   }
 
 } // namespace bind

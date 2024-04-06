@@ -7,7 +7,6 @@
 #include <bind/libbind.hh>
 #include <common.hh>
 #include <misc/error.hh>
-#include <common.hh>
 #include <object/libobject.hh>
 #define DEFINE_TASKS 1
 #include <object/tasks.hh>

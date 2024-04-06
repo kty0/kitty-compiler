@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <map>
 #include <ast/default-visitor.hh>
 #include <ast/non-object-visitor.hh>
 
@@ -50,8 +51,21 @@ namespace escapes
     using super_type = ast::DefaultVisitor;
     /// Import all the overloaded visit methods.
     using super_type::operator();
+    int current_scope = 1;
 
     // FIXME: Some code was deleted here.
+    // add scope_level
+    void operator()(ast::FunctionDec& e) override;
+    void operator()(ast::LetExp& e) override;
+    void operator()(ast::ForExp& e) override;
+    // add the variable declaration in the map
+    void operator()(ast::VarDec& e) override;
+    // checking if the variable is escaped
+    void operator()(ast::SimpleVar& e) override;
+
+  private:
+    // @ of the variable declaration and his scope-level
+    std::map<ast::VarDec*, int> scope_var;
   };
 
 } // namespace escapes

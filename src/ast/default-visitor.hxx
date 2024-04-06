@@ -198,9 +198,15 @@ namespace ast
   void GenDefaultVisitor<Const>::operator()(const_t<VarDec>& e)
   {
     // `type_name' might be omitted.
-    this->accept(e.type_name_get());
+    if(e.type_name_get() != nullptr)
+      {
+        this->accept(e.type_name_get());
+      }
     // `init' can be null in case of formal parameter.
-    this->accept(e.init_get());
+    if(e.init_get() != nullptr)
+      {
+        this->accept(e.init_get());
+      }
   }
 
   template <template <typename> class Const>
@@ -214,8 +220,15 @@ namespace ast
   {
     // FIXED: Some code was deleted here.
     e.formals_get().accept(*this);
-    e.result_get()->accept(*this);
-    e.body_get()->accept(*this);
+    if (e.result_get() != nullptr)
+      {
+        e.result_get()->accept(*this);
+      }
+
+    if (e.body_get() != nullptr)
+      {
+        e.body_get()->accept(*this);
+      }
   }
 
   template <template <typename> class Const>

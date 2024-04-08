@@ -24,7 +24,60 @@ namespace desugar
   `-----------------------------*/
   void DesugarVisitor::operator()(const ast::OpExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.oper_get() == ast::OpExp::Oper::eq)
+      {
+        const auto& left = recurse(e.left_get());
+        const auto& right = recurse(e.right_get());
+
+        desugar_string_cmp_p_ = true;
+        desugar_for_p_ = false;
+
+        parse::Tweast tweast;
+
+        tweast << "streq(\"" << left << "\", \"" << right << "\")";
+
+        ast::Exp* res = parse::parse(tweast);
+        result_ = res;
+      }
+    if (e.oper_get() == ast::OpExp::Oper::le
+        || e.oper_get() == ast::OpExp::Oper::lt
+        || e.oper_get() == ast::OpExp::Oper::ge
+        || e.oper_get() == ast::OpExp::Oper::gt)
+      {
+        const auto& left = recurse(e.left_get());
+        const auto& right = recurse(e.right_get());
+        std::string comparator;
+
+        if (e.oper_get() == ast::OpExp::Oper::le)
+          {
+            comparator = "<=";
+          }
+        else if (e.oper_get() == ast::OpExp::Oper::lt)
+          {
+            comparator = "<";
+          }
+        else if (e.oper_get() == ast::OpExp::Oper::ge)
+          {
+            comparator = ">=";
+          }
+        else
+          {
+            comparator = ">";
+          }
+
+        parse::Tweast tweast;
+
+        tweast << "strcmp(\"" << left << "\", \"" << right << "\") "
+               << comparator << " 0";
+
+        ast::Exp* res = parse::parse(tweast);
+        result_ = res;
+      }
+    else
+      {
+        super_type::operator()(e);
+      }
   }
 
   /*----------------------.
@@ -70,6 +123,26 @@ namespace desugar
   void DesugarVisitor::operator()(const ast::ForExp& e)
   {
     // FIXME: Some code was deleted here.
-  }
+    const auto& hi = recurse(e.hi_get());
+    const auto& body = recurse(e.body_get());
+    const auto& name = recurse(e.vardec_get().type_name_get());
+    const auto& exp = recurse(e.vardec_get());
 
+    desugar_for_p_ = true;
+    desugar_string_cmp_p_ = false;
+
+    parse::Tweast tweast;
+
+    tweast << "let"
+           << "var _lo := " << exp << "var _hi := " << hi << "var " << name
+           << " := _lo"
+           << "in"
+           << "if " << name << " <= _hi then"
+           << "while 1 do"
+           << "(" << body << ";"
+           << "if " << name << " = _hi then"
+           << "break;" << name << " := " << name << " + 1;"
+           << ")"
+           << "end";
+  }
 } // namespace desugar

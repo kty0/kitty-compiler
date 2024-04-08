@@ -144,5 +144,5 @@ namespace desugar
            << "break;" << name << " := " << name << " + 1;"
            << ")"
            << "end";
-  }
+   }
 } // namespace desugar

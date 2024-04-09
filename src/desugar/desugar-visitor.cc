@@ -25,6 +25,10 @@ namespace desugar
   void DesugarVisitor::operator()(const ast::OpExp& e)
   {
     // FIXED: Some code was deleted here.
+    if (!desugar_string_cmp_p_)
+      {
+        return;
+      }
     if (e.oper_get() == ast::OpExp::Oper::eq)
       {
         const auto& left = recurse(e.left_get());
@@ -123,13 +127,14 @@ namespace desugar
   void DesugarVisitor::operator()(const ast::ForExp& e)
   {
     // FIXED: Some code was deleted here.
+    if (!desugar_for_p_)
+      {
+        return;
+      }
     const auto& hi = recurse(e.hi_get());
     const auto& body = recurse(e.body_get());
     const auto& name = recurse(e.vardec_get().type_name_get());
     const auto& exp = recurse(e.vardec_get());
-
-    desugar_for_p_ = true;
-    desugar_string_cmp_p_ = false;
 
     parse::Tweast tweast;
 

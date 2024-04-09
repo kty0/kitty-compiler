@@ -122,7 +122,7 @@ namespace desugar
 
   void DesugarVisitor::operator()(const ast::ForExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
     const auto& hi = recurse(e.hi_get());
     const auto& body = recurse(e.body_get());
     const auto& name = recurse(e.vardec_get().type_name_get());

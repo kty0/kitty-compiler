@@ -12,7 +12,7 @@ namespace type
 
   inline const Type& Method::type_get() const
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   inline const ast::MethodDec* Method::def_get() const { return def_; }

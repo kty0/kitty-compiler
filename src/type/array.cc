@@ -8,6 +8,9 @@
 
 namespace type
 {
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+  Array::Array(const Type& type)
+    : type_(type)
+  {}
 
 } // namespace type

@@ -16,8 +16,37 @@ namespace type
 
   void Record::accept(Visitor& v) { v(*this); }
 
-  // FIXME: Some code was deleted here (Field manipulators).
+  // FIXED: Some code was deleted here (Field manipulators).
+  const Type* Record::field_type(misc::symbol key) const
+  {
+    int i = field_index(key);
+    if (i == -1)
+      {
+        return nullptr;
+      }
+    return &fields_[i].type_get();
+  }
 
-  // FIXME: Some code was deleted here (Special implementation of "compatible_with" for Record).
+  int Record::field_index(misc::symbol key) const
+  {
+    for (auto i = 0; i != fields_.size(); i++)
+      {
+        if (fields_[i].name_get() == key)
+          {
+            return i;
+          }
+      }
+    return -1;
+  }
 
+  // FIXED: Some code was deleted here (Special implementation of "compatible_with" for Record).
+
+  bool Record::compatible_with(const Type& other) const
+  {
+    if (dynamic_cast<const Nil*>(&other.actual()) || this->actual() == other)
+      {
+        return true;
+      }
+    return false;
+  }
 } // namespace type

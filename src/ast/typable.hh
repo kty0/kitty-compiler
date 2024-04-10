@@ -24,11 +24,11 @@ namespace ast
     // FIXED: Some code was deleted here.
 
   public:
-    type::Type* get_type();
-    void set_type(type::Type* type);
+    const type::Type* type_get() const;
+    void type_set(const type::Type* type);
 
   private:
-    type::Type* type_;
+    const type::Type* type_;
   };
 } // namespace ast
 #include <ast/typable.hxx>

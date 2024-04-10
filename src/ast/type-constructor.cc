@@ -12,8 +12,14 @@ namespace ast
 
   TypeConstructor::~TypeConstructor() { delete instance_; }
 
-  void TypeConstructor::created_type_set(type::Type* type) { instance_ = type; }
+  void TypeConstructor::created_type_set(const type::Type* type)
+  {
+    instance_ = type;
+  }
 
-  type::Type* TypeConstructor::created_type_get() { return instance_; }
+  const type::Type* TypeConstructor::created_type_get() const
+  {
+    return instance_;
+  }
 
 } // namespace ast

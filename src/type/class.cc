@@ -22,23 +22,23 @@ namespace type
 
   const Type* Class::attr_type(misc::symbol key) const
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   const Type* Class::meth_type(misc::symbol key) const
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
-  // FIXME: Some code was deleted here (Find common super class).
+  // IGNORED: Some code was deleted here (Find common super class).
 
-  // FIXME: Some code was deleted here (Super class soundness test).
+  // IGNORED: Some code was deleted here (Super class soundness test).
 
-  // FIXME: Some code was deleted here (Special implementation of "compatible_with" for Class).
+  // IGNORED: Some code was deleted here (Special implementation of "compatible_with" for Class).
 
   const Class& Class::object_instance()
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
 } // namespace type

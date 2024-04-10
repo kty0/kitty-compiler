@@ -56,7 +56,8 @@ namespace type
     const_iterator end() const;
     /** \} */
 
-    // FIXME: Some code was deleted here (Inherited method).
+    // FIXED: Some code was deleted here (Inherited method).
+    bool compatible_with(const Type& other) const override;
 
   protected:
     /// Fields list.

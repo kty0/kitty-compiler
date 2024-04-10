@@ -10,8 +10,8 @@ namespace ast
 {
   // FIXED: Some code was deleted here.
 
-  type::Type* Typable::get_type() { return type_; }
+  const type::Type* Typable::type_get() const { return type_; }
 
-  void Typable::set_type(type::Type* type) { type_ = type; }
+  void Typable::type_set(const type::Type* type) { type_ = type; }
 
 } // namespace ast

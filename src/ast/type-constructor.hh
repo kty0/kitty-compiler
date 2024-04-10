@@ -21,11 +21,11 @@ namespace ast
     TypeConstructor() = default;
     ~TypeConstructor();
 
-    void created_type_set(type::Type*);
-    type::Type* created_type_get();
+    void created_type_set(const type::Type*);
+    const type::Type* created_type_get() const;
 
   private:
-    type::Type* instance_;
+    const type::Type* instance_;
   };
 } // namespace ast
 #include <ast/type-constructor.hxx>

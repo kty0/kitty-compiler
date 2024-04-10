@@ -114,7 +114,7 @@ namespace type
     bool sound() const;
     /** \} */
 
-    // FIXME: Some code was deleted here (Inherited methods).
+    // IGNORED: Some code was deleted here (Inherited methods).
 
     /// Return the unique instance of the class type `Object'.
     static const Class& object_instance();

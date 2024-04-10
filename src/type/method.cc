@@ -25,6 +25,6 @@ namespace type
 
   void Method::accept(Visitor& v) { v(*this); }
 
-  // FIXME: Some code was deleted here.
+  // IGNORED: Some code was deleted here.
 
 } // namespace type

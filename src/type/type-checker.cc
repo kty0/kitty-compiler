@@ -19,13 +19,26 @@ namespace type
 
   const Type* TypeChecker::type(ast::Typable& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.type_get() != nullptr)
+      {
+        return e.type_get();
+      }
+
+    e.accept(*this);
+    if (e.type_get() == nullptr)
+      {
+        e.type_set(&Int::instance());
+      }
+    return e.type_get();
   }
 
   const Record* TypeChecker::type(const ast::fields_type& e)
   {
     auto res = new Record;
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    for (const auto& field : e)
+      res->field_add(field->name_get(), *type(field->type_name_get()));
     return res;
   }
 
@@ -67,12 +80,27 @@ namespace type
                                 const std::string& exp2,
                                 const Type& type2)
   {
-    // FIXME: Some code was deleted here (Check for type mismatch).
+    // FIXED: Some code was deleted here (Check for type mismatch).
+    if (!type1.compatible_with(type2))
+      {
+        type_mismatch(ast, exp1, type1, exp2, type2);
+      }
 
     // If any of the type is Nil, set its `record_type_` to the other type.
     if (!error_)
       {
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        const Nil *first = dynamic_cast<const Nil *>(&type1);
+        const Nil *second = dynamic_cast<const Nil *>(&type2);
+
+        if (first != nullptr && second == nullptr)
+          {
+            first->record_type_set(type2);
+          }
+        else if (first == nullptr && second != nullptr)
+          {
+            second->record_type_set(type1);
+          }
       }
   }
 
@@ -85,7 +113,8 @@ namespace type
     // Ensure evaluation order.
     type(type1);
     type(type2);
-    // FIXME: Some code was deleted here (Check types).
+    // FIXED: Some code was deleted here (Check types).
+    check_types(ast, exp1, *type1.type_get(), exp2, *type2.type_get());
   }
 
   /*--------------------------.
@@ -98,10 +127,49 @@ namespace type
 
   void TypeChecker::operator()(ast::SimpleVar& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.type_set(e.def_get()->type_get());
   }
 
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+
+  void TypeChecker::operator()(ast::FieldVar& e)
+  {
+    const type::Record* record_type =
+      dynamic_cast<const type::Record*>(type(e.var_get()));
+    if (record_type == nullptr)
+      {
+        error(e, "var must be a record");
+        type_default(e, &Int::instance());
+        return;
+      }
+
+    const Type *field_type = record_type->field_type(e.name_get());
+    if (field_type == nullptr)
+      {
+        error(e, "unknown field");
+        type_default(e, &Int::instance());
+        return;
+      }
+
+    type_default(e, field_type);
+  }
+
+  void TypeChecker::operator()(ast::SubscriptVar& e)
+  {
+    check_types(e, "index", *type(e.index_get()), "expected", Int::instance());
+
+    const type::Array* array_type =
+      dynamic_cast<const type::Array*>(type(e.var_get()));
+    if (array_type == nullptr)
+      {
+        error(e, "var must be an array");
+        type_default(e, &Int::instance());
+        return;
+      }
+
+    e.type_set(e.var_get().type_get());
+  }
 
   /*-----------------.
   | Visiting /Exp/.  |
@@ -117,27 +185,172 @@ namespace type
 
   void TypeChecker::operator()(ast::IntExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    type_default(e, &Int::instance());
   }
 
   void TypeChecker::operator()(ast::StringExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    type_default(e, &String::instance());
   }
 
   // Complex values.
 
   void TypeChecker::operator()(ast::RecordExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const type::Record* record_type =
+      dynamic_cast<const type::Record*>(type(e.type_name_get()));
+    if (record_type == nullptr)
+      {
+        error(e, "type should be a record");
+        type_default(e, &Int::instance());
+        return;
+      }
+
+    auto fields = e.fields_get();
+    for (int i = 0; i < fields.size(); i++)
+      {
+        check_types(e, "field", *type(fields[i]->init_get()), "expected",
+                    record_type->fields_get()[i].type_get());
+      }
+
+    type_default(e, e.type_name_get().type_get());
   }
 
   void TypeChecker::operator()(ast::OpExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    check_types(e, "left operand", e.left_get(), "right operand",
+                e.right_get());
+
+    type_default(e, e.left_get().type_get());
   }
 
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+
+  void TypeChecker::operator()(ast::ArrayExp& e)
+  {
+    check_types(e, "size clause", *type(e.size_get()), "expected",
+                Int::instance());
+
+    const Array *array_type = dynamic_cast<const Array *>(type(e.type_name_get()));
+    if (array_type == nullptr)
+      {
+        error(e, "expected array type");
+        type_default(e, &Int::instance());
+      }
+
+    check_types(e, "array", array_type->type_get(), "initializing",
+                *type(e.init_get()));
+
+    type_default(e, e.type_name_get().type_get());
+  }
+
+  void TypeChecker::operator()(ast::ForExp& e)
+  {
+    check_types(e, "counter", *type(e.vardec_get()), "expected",
+                Int::instance());
+    check_types(e, "bound", *type(e.hi_get()), "expected", Int::instance());
+
+    check_types(e, "body", *type(e.body_get()), "expected", Void::instance());
+  }
+
+  void TypeChecker::operator()(ast::AssignExp& e)
+  {
+    check_types(e, "variable", *type(e.var_get()), "expression",
+                *type(e.exp_get()));
+
+    type_default(e, &Void::instance());
+  }
+
+  void TypeChecker::operator()(ast::LetExp& e)
+  {
+    (*this)(e.chunks_get());
+    e.type_set(type(e.body_get()));
+  }
+
+  void TypeChecker::operator()(ast::IfExp& e)
+  {
+    check_types(e, "test clause", *type(e.test_get()), "expected",
+                Int::instance());
+
+    check_types(e, "then clause", e.thenclause_get(), "else clause",
+                e.elseclause_get());
+
+    e.type_set(e.thenclause_get().type_get());
+  }
+
+  void TypeChecker::operator()(ast::CallExp& e)
+  {
+    if (e.def_get() == nullptr)
+      {
+        return;
+      }
+
+    const Function* function =
+      dynamic_cast<const Function*>(e.def_get()->type_get());
+    if (function == nullptr)
+      {
+        error(e, "missing function type");
+        type_default(e, &Int::instance());
+      }
+
+    std::vector<Field> fields = function->formals_get().fields_get();
+    ast::exps_type exps = e.args_get();
+
+    if (fields.size() != exps.size())
+      {
+        error(e, "more formals than given");
+        type_default(e, &Int::instance());
+        return;
+      }
+
+    for (int i = 0; i < fields.size(); i++)
+      {
+        check_types(e, "argument", *type(*exps[i]), "expected",
+                    fields[i].type_get());
+      }
+
+    type_default(e, &function->result_get());
+  }
+
+  void TypeChecker::operator()(ast::SeqExp& e)
+  {
+    std::vector<ast::Exp*> exps = e.exps_get();
+    if (exps.size() == 0)
+      {
+        type_default(e, &Void::instance());
+        return;
+      }
+
+    const type::Type* exp_type;
+    for (auto it = exps.begin(); it != exps.end(); it++)
+      {
+        exp_type = type(**it);
+      }
+
+    type_default(e, exp_type);
+  }
+
+  void TypeChecker::operator()(ast::BreakExp& e)
+  {
+    type_default(e, &Void::instance());
+  }
+
+  void TypeChecker::operator()(ast::CastExp& e)
+  {
+    type_default(e, type(e.ty_get()));
+  }
+
+  void TypeChecker::operator()(ast::WhileExp& e)
+  {
+    check_types(e, "test clause", *type(e.test_get()), "expected",
+                Int::instance());
+
+    check_types(e, "body", *type(e.body_get()), "expected", Void::instance());
+  }
 
   /*-----------------.
   | Visiting /Dec/.  |
@@ -162,7 +375,12 @@ namespace type
   template <>
   void TypeChecker::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const Type* result =
+      e.result_get() == nullptr ? &Void::instance() : type(*e.result_get());
+    Function* function = new Function(type(e.formals_get()), *result);
+    type_default(e, function);
+    created_type_default(e, function);
   }
 
   // Type check this function's body.
@@ -179,7 +397,29 @@ namespace type
 
   void TypeChecker::operator()(ast::VarDec& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.init_get() == nullptr)
+      {
+        const type::Type* namety_type = type(*e.type_name_get());
+
+        type_default(e, namety_type);
+        return;
+      }
+
+    const type::Type *exp_type = type(*e.init_get());
+
+    if (e.type_name_get() != nullptr)
+      {
+        const type::Type* namety_type = type(*e.type_name_get());
+
+        check_types(e, "type", *namety_type, "expression", *exp_type);
+      }
+    else if (dynamic_cast<const Nil *>(exp_type))
+      {
+        error(e, "assigning nil to untyped var");
+      }
+
+    type_default(e, exp_type);
   }
 
   /*--------------------.
@@ -203,13 +443,16 @@ namespace type
     // We only process the head of the type declaration, to set its
     // name in E.  A declaration has no type in itself; here we store
     // the type declared by E.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    type::Type* name_type = new Named(e.name_get());
+    type_default(e, name_type);
   }
 
   // Bind the type body to its name.
   template <> void TypeChecker::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    e.type_set(type(e.ty_get()));
   }
 
   /*------------------.
@@ -218,7 +461,15 @@ namespace type
 
   template <class D> void TypeChecker::chunk_visit(ast::Chunk<D>& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    for (const auto dec : e)
+      {
+        visit_dec_header<D>(*dec);
+      }
+    for (const auto dec : e)
+      {
+        visit_dec_body<D>(*dec);
+      }
   }
 
   /*-------------.
@@ -227,17 +478,49 @@ namespace type
 
   void TypeChecker::operator()(ast::NameTy& e)
   {
-    // FIXME: Some code was deleted here (Recognize user defined types, and built-in types).
+    // FIXED: Some code was deleted here (Recognize user defined types, and built-in types).
+    const type::Type* ty;
+    if (e.def_get() == nullptr)
+      {
+        misc::symbol name = e.name_get();
+        if (name == "int")
+          {
+            ty = &Int::instance();
+          }
+        else if (name == "string")
+          {
+            ty = &String::instance();
+          }
+        else
+          {
+            ty = &Void::instance();
+          }
+      }
+    else
+      {
+        ty = e.def_get()->type_get();
+      }
+
+    type_default(e, ty);
+    created_type_default(e, ty);
   }
 
   void TypeChecker::operator()(ast::RecordTy& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const Record *record_ptr = type(e.fields_get());
+
+    type_default(e, record_ptr);
+    created_type_default(e, record_ptr);
   }
 
   void TypeChecker::operator()(ast::ArrayTy& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    auto array_ptr = new Array(*type(e.base_type_get()));
+
+    type_default(e, array_ptr);
+    created_type_default(e, array_ptr);
   }
 
 } // namespace type

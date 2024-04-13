@@ -17,7 +17,7 @@ namespace object
   {
     // `self' variables are the only valid variables having a null
     // declaration site.  Use this property to tag them as read-only.
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   /*--------------------------.
@@ -30,18 +30,18 @@ namespace object
 
   void TypeChecker::operator()(ast::SimpleVar& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   void TypeChecker::operator()(ast::FieldVar& e)
   {
     const type::Type* def_type = nullptr;
-    // FIXME: Some code was deleted here (Grab type).
+    // IGNORED: Some code was deleted here (Grab type).
     auto class_type = dynamic_cast<const type::Class*>(&def_type->actual());
 
     if (class_type)
       {
-        // FIXME: Some code was deleted here.
+        // IGNORED: Some code was deleted here.
       }
     else
       super_type::operator()(e);
@@ -54,7 +54,7 @@ namespace object
   // Handle the case of `Object'.
   void TypeChecker::operator()(ast::NameTy& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   /*-----------------.
@@ -75,7 +75,7 @@ namespace object
     // in
     //    a.print() /* error */
     // end
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   void TypeChecker::operator()(ast::OpExp& e)
@@ -91,17 +91,17 @@ namespace object
     // in
     //   a = b
     // end
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   void TypeChecker::operator()(ast::ObjectExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   void TypeChecker::operator()(ast::MethodCallExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   /*-----------------.
@@ -152,7 +152,7 @@ namespace object
   {
     assertion(current_);
 
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
 
     // Check for multiple definitions in the current class.
     for (const type::Method* m : current_->meths_get())
@@ -162,7 +162,7 @@ namespace object
     // Check for signature conformance w.r.t. super class, if applicable.
     const auto* super_meth_type =
       dynamic_cast<const type::Method*>(current_->meth_type(e.name_get()));
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   // Type check this method's body.
@@ -216,11 +216,11 @@ namespace object
   // Don't handle members, as visit_dec_members is in charge of this task.
   void TypeChecker::operator()(ast::ClassTy& e)
   {
-    // FIXME: Some code was deleted here (Create class).
+    // IGNORED: Some code was deleted here (Create class).
 
-    // FIXME: Some code was deleted here (Set the type of the super class).
+    // IGNORED: Some code was deleted here (Set the type of the super class).
 
-    // FIXME: Some code was deleted here (Recursively update the list of subclasses of the super classes).
+    // IGNORED: Some code was deleted here (Recursively update the list of subclasses of the super classes).
   }
 
   // Handle the members of a class.
@@ -228,7 +228,7 @@ namespace object
   {
     assertion(!within_class_body_p_); // Should be false by the time we get here
     const type::Type* type = nullptr;
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
 
     assertion(type);
     auto class_type = dynamic_cast<const type::Class*>(type);

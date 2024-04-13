@@ -62,37 +62,58 @@ namespace type
 
   void PrettyPrinter::operator()(const Int&)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    ostr_ << "int";
   }
 
   void PrettyPrinter::operator()(const String&)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    ostr_ << "string";
   }
 
   void PrettyPrinter::operator()(const Named& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    ostr_ << e.name_get() << " : " << e.actual();
   }
 
   void PrettyPrinter::operator()(const Array& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    ostr_ << "array of " << e.type_get();
   }
 
   void PrettyPrinter::operator()(const Record& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.fields_get().empty())
+      {
+        return;
+      }
+
+    ostr_ << "record {";
+
+    std::vector<Field> fields = e.fields_get();
+
+    ostr_ << (*fields.begin()).name_get() << " : " << (*fields.begin()).type_get();
+    for (auto it = fields.begin() + 1; it != fields.end(); it++)
+      {
+        ostr_ << ", " << it->name_get() << " : " << it->type_get();
+      }
+
+    ostr_ << "}";
   }
 
   void PrettyPrinter::operator()(const Class& e)
   {
-    // FIXME: Some code was deleted here.
+    // IGNORED: Some code was deleted here.
   }
 
   void PrettyPrinter::operator()(const Function& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    ostr_ << "function ( " << e.formals_get() << " ) : " << e.result_get();
   }
 
   void PrettyPrinter::operator()(const Attribute& e)

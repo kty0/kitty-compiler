@@ -15,10 +15,15 @@ namespace type
   {
     // FIXED: Some code was deleted here.
   public:
-    virtual ~Array() = default;
+    ~Array() = default;
     Array(const Type& type);
 
     const Type& type_get() const;
+
+    /// Accept a const visitor \a v.
+    void accept(ConstVisitor& v) const override;
+    /// Accept a non-const visitor \a v.
+    void accept(Visitor& v) override;
 
   private:
     const Type& type_;

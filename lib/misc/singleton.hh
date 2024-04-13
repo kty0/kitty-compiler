@@ -10,6 +10,7 @@ namespace misc
   template <typename T> class Singleton
   {
     // FIXED: Some code was deleted here.
+  protected:
     Singleton() = default;
 
   public:

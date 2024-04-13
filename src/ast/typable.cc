@@ -13,5 +13,4 @@ namespace ast
   const type::Type* Typable::type_get() const { return type_; }
 
   void Typable::type_set(const type::Type* type) { type_ = type; }
-
 } // namespace ast

@@ -25,19 +25,28 @@ namespace type
   template <typename NodeType>
   void TypeChecker::type_default(NodeType& e, const type::Type* type)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.type_get() == nullptr)
+    {
+      e.type_set(type);
+    }
   }
 
   template <typename NodeType>
   void TypeChecker::created_type_default(NodeType& e, const type::Type* type)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.created_type_get() == nullptr)
+    {
+      e.type_set(type);
+    }
   }
 
   template <typename NodeType>
   void TypeChecker::type_set(NodeType& e, const type::Type* type)
   {
-    // FIXME: Some code was deleted here (Basically e.type_set(type)).
+    // FIXED: Some code was deleted here (Basically e.type_set(type)).
+    e.type_set(type);
   }
 
   /*-----------------.
@@ -65,7 +74,13 @@ namespace type
                                const std::string& s,
                                const Type& expected)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (expected.compatible_with(*e.get_type()))
+    {
+      return;
+    }
+
+    type_mismatch(e, s, e.type_get(), "expected", expected);
   }
 
   /*------------.
@@ -75,7 +90,14 @@ namespace type
   template <typename Routine_Type, typename Routine_Node>
   void TypeChecker::visit_routine_body(Routine_Node& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const Type *body_type = type(*e.body_get());
+    const Function *function = dynamic_cast<const Function *>(e.type_get());
+    if (function == nullptr)
+      {
+        error(e, "missing function type");
+      }
+    check_types(e, "return", function->result_get(), "body", *body_type);
   }
 
 } // namespace type

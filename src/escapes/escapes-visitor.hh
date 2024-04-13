@@ -53,7 +53,7 @@ namespace escapes
     using super_type::operator();
     int current_scope = 1;
 
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
     // add scope_level
     void operator()(ast::FunctionDec& e) override;
     void operator()(ast::LetExp& e) override;

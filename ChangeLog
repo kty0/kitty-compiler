@@ -1,3 +1,15 @@
+2024-04-15  Mael Cravero  <mael.cravero@epita.fr>
+
+	Makefile.am: allow multiple chars in stages names
+
+	* Makefile.am: here.
+
+2024-04-08  Mael Cravero  <mael.cravero@epita.fr>
+
+	Version 1.93.e for 2025-tc-L.0
+
+	* NEWS.txt, configure.ac, .last-cl-gen, ChangeLog: here.
+
 2024-03-28  Mael Cravero  <mael.cravero@epita.fr>
 
 	Version 1.93.d for 2025-tc-4.0
@@ -23538,7 +23550,7 @@
 
 2010-01-08  Roland Levillain  <roland@lrde.epita.fr>
 
-	Handle $Id: c65d9874db9cfe7042b30acf3c15a15886117aa5 $ using gitattributes.
+	Handle $Id: 84c8f64096bc1f98f4963654b788ed73079b50de $ using gitattributes.
 
 2010-01-08  Roland Levillain  <roland@lrde.epita.fr>
 
@@ -48610,7 +48622,7 @@
 	* src/Makefile.am: Adjust.
 	* Makefile.am (version.h): Replace with...
 	(authors.h): these.
-	* tests/tc-check.in ($revision): Use $Id: c65d9874db9cfe7042b30acf3c15a15886117aa5 $.
+	* tests/tc-check.in ($revision): Use $Id: 84c8f64096bc1f98f4963654b788ed73079b50de $.
 
 
 	git-svn-id: https://svn.lrde.epita.fr/svn/tc/trunk@1507 1f7e7f5b-0dda-0310-9018-85e83a419b00

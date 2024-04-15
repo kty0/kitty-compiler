@@ -15,6 +15,10 @@ namespace object
   TypeChecker::TypeChecker()
     : super_type()
   {
+    // Reset the subclasses of Object.  This is required if several
+    // trees are processed during the compilation.
+    type::Class::object_instance().subclasses_clear();
+
     // `self' variables are the only valid variables having a null
     // declaration site.  Use this property to tag them as read-only.
     // FIXME: Some code was deleted here.

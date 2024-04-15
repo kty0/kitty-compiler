@@ -13,7 +13,9 @@ namespace type
 {
   Class::Class(const Class* super)
     : Type()
+    , id_(fresh_id())
     , super_(super)
+    , subclasses_()
   {}
 
   void Class::accept(ConstVisitor& v) const { v(*this); }
@@ -39,6 +41,12 @@ namespace type
   const Class& Class::object_instance()
   {
     // FIXME: Some code was deleted here.
+  }
+
+  unsigned Class::fresh_id()
+  {
+    static unsigned counter_ = 0;
+    return counter_++;
   }
 
 } // namespace type

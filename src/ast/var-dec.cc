@@ -8,6 +8,7 @@
 
 namespace ast
 {
+
   VarDec::VarDec(const Location& location,
                  misc::symbol name,
                  NameTy* type_name,

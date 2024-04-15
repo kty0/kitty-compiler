@@ -72,6 +72,7 @@ int             [0-9]+
 space           [ \t]
 endofline       (\n\r)|(\r\n)|(\r)|(\n)
 id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
+rid              _[a-zA-Z0-9_]*
 
 %class {
   // FIXED: Some code was deleted here (Local variables).
@@ -165,6 +166,8 @@ id              ([a-zA-Z][a-zA-Z0-9_]*)|("_main")
 ":=" { return TOKEN(ASSIGN); }
 
 {id} { return TOKEN_VAL(ID, text()); }
+
+{rid} { return TOKEN_VAL(ID, text()); }
 
 
 "\""        { grown_string.clear(); start(SC_STRING); } /* start of a string */

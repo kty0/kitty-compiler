@@ -350,6 +350,8 @@ namespace type
                 Int::instance());
 
     check_types(e, "body", *type(e.body_get()), "expected", Void::instance());
+
+    type_default(e, &Void::instance());
   }
 
   /*-----------------.

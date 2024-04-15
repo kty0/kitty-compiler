@@ -21,8 +21,6 @@ namespace bind
     count++;
     // Add the new name to the VarDec
     e.name_set(sym);
-    // Add this VarDec in the map with his new name
-    map[&e] = name;
 
     if (e.type_name_get() != nullptr)
       {
@@ -53,8 +51,6 @@ namespace bind
         count++;
         // Add the new name to the FunctionDec
         e.name_set(sym);
-        // Add this FunctionDec in the map with his new name
-        map[&e] = name;
       }
 
     if (e.body_get() != nullptr)
@@ -72,8 +68,6 @@ namespace bind
     count++;
     // Add the new name to the TypeDec
     e.name_set(sym);
-    // Add this TypeDec in the map with his new name
-    map[&e] = name;
     (*this)(e.ty_get());
   }
 
@@ -86,24 +80,9 @@ namespace bind
     count++;
     // Add the new name to the MethodDec
     e.name_set(sym);
-    // Add this MethodDec in the map with his new name
-    map[&e] = name;
     (*this)(e.formals_get());
     (*this)(e.result_get());
     (*this)(e.body_get());
-  }
-
-  void Renamer::operator()(ast::SimpleVar& e)
-  {
-    VarDec* dec = e.def_get();
-    auto res = map.find(dec);
-    if (res == map.end())
-      {
-        return;
-      }
-    // Make the new name
-    misc::symbol sym = misc::symbol(res->second);
-    e.name_set(sym);
   }
 
   void Renamer::operator()(ast::NameTy& e)
@@ -114,26 +93,23 @@ namespace bind
       }
 
     Dec* dec = e.def_get();
-    auto res = map.find(dec);
-    if (res == map.end())
-      {
-        return;
-      }
     // Make the new name
-    misc::symbol sym = misc::symbol(res->second);
+    misc::symbol sym = misc::symbol(dec->name_get());
+    e.name_set(sym);
+  }
+
+  void Renamer::operator()(ast::SimpleVar& e)
+  {
+    VarDec* dec = e.def_get();
+    misc::symbol sym = misc::symbol(dec->name_get());
     e.name_set(sym);
   }
 
   void Renamer::operator()(ast::CallExp& e)
   {
     FunctionDec* dec = e.def_get();
-    auto res = map.find(dec);
-    if (res == map.end())
-      {
-        return;
-      }
     // Make the new name
-    misc::symbol sym = misc::symbol(res->second);
+    misc::symbol sym = misc::symbol(dec->name_get());
     e.name_set(sym);
 
     for (Exp* exp : e.args_get())
@@ -145,13 +121,8 @@ namespace bind
   void Renamer::operator()(ast::MethodCallExp& e)
   {
     FunctionDec* dec = e.def_get();
-    auto res = map.find(dec);
-    if (res == map.end())
-      {
-        return;
-      }
     // Make the new name
-    misc::symbol sym = misc::symbol(res->second);
+    misc::symbol sym = misc::symbol(dec->name_get());
     e.name_set(sym);
     for (Exp* exp : e.args_get())
       {

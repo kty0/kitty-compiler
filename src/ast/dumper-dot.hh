@@ -68,7 +68,7 @@ namespace ast
     void dump(const std::string& field, const ast::Ast& t);
     void dump(const std::string& field, const ast::Ast* t);
     template <typename Container>
-    requires misc::ConstIterable<Container>
+      requires misc::ConstIterable<Container>
     void dump_list(const std::string& field, const Container& l);
     template <typename T> void dump_def(const T& e) const;
     void dump_type(const ast::Typable& e);

@@ -14,7 +14,6 @@
 
 namespace bind
 {
-
   /*-----------------.
   | Error handling.  |
   `-----------------*/

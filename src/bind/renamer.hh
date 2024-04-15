@@ -55,7 +55,6 @@ namespace bind
   private:
     // FIXED: Some code was deleted here.
     int count = 0;
-    std::map<ast::Dec*, std::string> map;
   };
 
 } // namespace bind

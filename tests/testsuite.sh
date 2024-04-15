@@ -16,7 +16,7 @@ check() {
 
     counter=$(($counter + 1))
 
-    "$tc" "$3" "$file" 1> /dev/null 2> /dev/null
+    "$tc" $3 "$1" 1> /dev/null 2> /dev/null
 
     if [ $? -eq $2 ]; then
       echo "${GREEN}✓${NC} $tc $3 $file"
@@ -27,7 +27,7 @@ check() {
 }
 
 for file in $(find "good" -name "*.tig"); do
-  check "$file" 0 "-XbBeEAT"
+  check "$file" 0 "--rename -bBeEAT"
 done
 
 for file in $(find "syntax" -name "*.tig"); do

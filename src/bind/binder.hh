@@ -50,8 +50,10 @@ namespace bind
   {
   public:
     // using for tuple
+    // to store the last scope assignation for FunctionDec, VarDec, TypeDec
+    using chunk_tracker = std::tuple<int,int,int>;
     using binding_tuples =
-      std::tuple<ast::FunctionDec*, ast::VarDec*, ast::TypeDec*>;
+      std::tuple<ast::FunctionDec*, ast::VarDec*, ast::TypeDec*, chunk_tracker>;
     /// Super class type.
     using super_type = ast::DefaultVisitor;
     /// Import all the overloaded \c operator() methods.
@@ -70,6 +72,7 @@ namespace bind
     void operator()(ast::BreakExp& e) override;
     void operator()(ast::NameTy& e) override;
     void operator()(ast::LetExp& e) override;
+
 
     // ---------------- //
     // Visiting /Dec/.  //
@@ -94,6 +97,15 @@ namespace bind
     void operator()(ast::FunctionDec& e) override;
     void operator()(ast::TypeDec& e) override;
     void operator()(ast::VarDec& e) override;
+    void operator()(ast::FunctionChunk& e) override;
+    void operator()(ast::TypeChunk& e) override;
+    void operator()(ast::VarChunk& e)override;
+    template <class D>
+    void chunk_visit(ast::Chunk<D>& e);
+    template <class D> void visit_dec_header(D& e);
+    template <class D>
+    void visit_dec_body(D& e);
+
     /// \}
 
   protected:
@@ -106,6 +118,15 @@ namespace bind
     // Stack to save for and while nodes
     std::stack<ast::Exp*> break_stack;
   };
+
+  template <>
+  void Binder::visit_dec_body<ast::FunctionDec>(ast::FunctionDec& e);
+  template <>
+  void Binder::visit_dec_body<ast::TypeDec>(ast::TypeDec& e);
+  template <>
+  void Binder::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e);
+  template <>
+  void Binder::visit_dec_header<ast::TypeDec>(ast::TypeDec& e);
 
 } // namespace bind
 

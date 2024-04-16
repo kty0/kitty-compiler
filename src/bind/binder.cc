@@ -8,6 +8,9 @@
 #define GETFUN std::get<ast::FunctionDec*>(t)
 #define GETVAR std::get<ast::VarDec*>(t)
 #define GETTYPE std::get<ast::TypeDec*>(t)
+#define GET_LAST_CHUNK_FUN std::get<0>(std::get<chunk_tracker>(t))
+#define GET_LAST_CHUNK_VAR std::get<1>(std::get<chunk_tracker>(t))
+#define GET_LAST_CHUNK_TYPE std::get<2>(std::get<chunk_tracker>(t))
 
 #include <cstring>
 #include <misc/contract.hh>
@@ -18,91 +21,183 @@ namespace bind
   | Error handling.  |
   `-----------------*/
 
+  // to show the number of scope
+  int nb_chunks = 0;
+
   /// The error handler.
   const misc::error& Binder::error_get() const { return error_; }
 
   // FIXED: Some code was deleted here.
 
-  void Binder::operator()(ast::FunctionDec& e)
+  /*
+   *     ________________________
+   *    |                        |
+   *    |  Visiting dec headers  |
+   *    |________________________|
+   */
+
+  template <class D> void Binder::visit_dec_header(D& e) {}
+
+  template <> void Binder::visit_dec_header<ast::TypeDec>(ast::TypeDec& e)
   {
     try
       {
         binding_tuples t = this->sm.get(e.name_get());
-        if (GETFUN != nullptr)
+        if (GETTYPE != nullptr && GET_LAST_CHUNK_TYPE == nb_chunks)
           {
             this->error_ << misc::error::error_type::bind << e.location_get()
-                         << ": bind error, redefinition of function "
-                         << e.name_get() << "\n";
+                         << ": bind error, redefinition of type "
+                         << e.name_get() << "\n"
+                         << GETTYPE->location_get() << ": first definition"
+                         << "\n";
           }
         else
           {
-            sm.put(e.name_get(), {&e, GETVAR, GETTYPE});
+            sm.put(e.name_get(),
+                   {GETFUN,
+                    GETVAR,
+                    &e,
+                    {GET_LAST_CHUNK_FUN, GET_LAST_CHUNK_VAR, nb_chunks}});
           }
       }
     catch (std::invalid_argument& er)
       {
-        this->sm.put(e.name_get(), {&e, nullptr, nullptr});
+        this->sm.put(e.name_get(), {nullptr, nullptr, &e, {0, 0, nb_chunks}});
       }
+  }
 
+  template <>
+  void Binder::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e)
+  {
+    try
+      {
+        binding_tuples t = this->sm.get(e.name_get());
+        if (GETFUN != nullptr && GET_LAST_CHUNK_FUN == nb_chunks)
+          {
+            this->error_ << misc::error::error_type::bind << e.location_get()
+                         << ": bind error, redefinition of function "
+                         << e.name_get() << "\n"
+                         << GETFUN->location_get() << ": first definition\n";
+          }
+        else
+          {
+            sm.put(e.name_get(),
+                   {&e,
+                    GETVAR,
+                    GETTYPE,
+                    {nb_chunks, GET_LAST_CHUNK_VAR, GET_LAST_CHUNK_TYPE}});
+          }
+      }
+    catch (std::invalid_argument& er)
+      {
+        this->sm.put(e.name_get(), {&e, nullptr, nullptr, {nb_chunks, 0, 0}});
+      }
+  }
+
+  /*
+   *     _____________________
+   *    |                     |
+   *    |  Visiting dec body  |
+   *    |_____________________|
+   */
+
+  template <class D> void Binder::visit_dec_body(D& e) {}
+
+  template <> void Binder::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
+  {
+    (*this)(e.ty_get());
+  }
+
+  template <> void Binder::visit_dec_body<ast::FunctionDec>(ast::FunctionDec& e)
+  {
     this->sm.scope_begin(); // open the scope
-
     (*this)(e.formals_get()); // visit
 
     if (e.result_get() != nullptr)
       {
-        (*this)(e.result_get()); // visit
+        (*this)(*e.result_get()); // visit
       }
 
     if (e.body_get() != nullptr)
       {
-        (*this)(e.body_get()); // visit
+        (*this)(*e.body_get()); // visit
       }
-
     this->sm.scope_end(); // close the scope
   }
 
-  void Binder::operator()(ast::TypeDec& e)
+  /*
+   *     _____________________
+   *    |                     |
+   *    |   Visiting Chunks   |
+   *    |_____________________|
+   */
+
+  template <class D> void Binder::chunk_visit(ast::Chunk<D>& e)
   {
-    try
+    for (const auto dec : e)
       {
-        binding_tuples t = this->sm.get(e.name_get());
-        if (GETTYPE != nullptr)
-          {
-            this->error_ << misc::error::error_type::bind << e.location_get()
-                         << ": bind error, redefinition of type "
-                         << e.name_get() << "\n";
-          }
-        else
-          {
-            sm.put(e.name_get(), {GETFUN, GETVAR, &e});
-          }
+        visit_dec_header<D>(*dec);
       }
-    catch (std::invalid_argument& er)
+    for (const auto dec : e)
       {
-        this->sm.put(e.name_get(), {nullptr, nullptr, &e});
+        visit_dec_body<D>(*dec);
       }
-    (*this)(e.ty_get());
   }
+
+  void Binder::operator()(ast::FunctionChunk& e)
+  {
+    nb_chunks++;
+    chunk_visit<ast::FunctionDec>(e);
+  }
+
+  void Binder::operator()(ast::TypeChunk& e)
+  {
+    nb_chunks++;
+    chunk_visit<ast::TypeDec>(e);
+  }
+
+  void Binder::operator()(ast::VarChunk& e)
+  {
+    nb_chunks++;
+    super_type::chunk_visit<ast::VarChunk>(e);
+  }
+
+  /*
+   *     _____________________
+   *    |                     |
+   *    |     Visiting Dec    |
+   *    |_____________________|
+   */
+
+  void Binder::operator()(ast::FunctionDec& e) { unreachable(); }
+
+  void Binder::operator()(ast::TypeDec& e) { unreachable(); }
 
   void Binder::operator()(ast::VarDec& e)
   {
     try
       {
         binding_tuples t = this->sm.get(e.name_get());
-        if (GETVAR != nullptr)
+        if (GETVAR != nullptr && GET_LAST_CHUNK_VAR == nb_chunks)
           {
             this->error_ << misc::error::error_type::bind << e.location_get()
                          << ": bind error, redefinition of variable "
-                         << e.name_get() << "\n";
+                         << e.name_get() << "\n"
+                         << GETVAR->location_get() << ": first definition"
+                         << "\n";
           }
         else
           {
-            sm.put(e.name_get(), {GETFUN, &e, GETTYPE});
+            sm.put(e.name_get(),
+                   {GETFUN,
+                    &e,
+                    GETTYPE,
+                    {GET_LAST_CHUNK_FUN, nb_chunks, GET_LAST_CHUNK_TYPE}});
           }
       }
     catch (std::invalid_argument& er)
       {
-        this->sm.put(e.name_get(), {nullptr, &e, nullptr});
+        this->sm.put(e.name_get(), {nullptr, &e, nullptr, {0, nb_chunks, 0}});
       }
 
     if (e.type_name_get() != nullptr)
@@ -114,6 +209,13 @@ namespace bind
         (*this)(e.init_get());
       }
   }
+
+  /*
+   *     _____________________
+   *    |                     |
+   *    |    Visiting Exps    |
+   *    |_____________________|
+   */
 
   void Binder::operator()(ast::ForExp& e)
   {
@@ -248,6 +350,7 @@ namespace bind
     e.def_set(brk);
     break_stack.pop();
   }
+
   void Binder::operator()(ast::LetExp& e)
   {
     sm.scope_begin();

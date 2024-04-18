@@ -28,6 +28,7 @@ namespace ast
 
     virtual void accept(ConstVisitor& v) const = 0;
     virtual void accept(Visitor& v) = 0;
+
   private:
     const type::Type* type_;
   };

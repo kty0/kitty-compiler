@@ -37,7 +37,7 @@ namespace type
   bool Named::sound() const
   {
     // FIXED: Some code was deleted here (Sound).
-    for (auto elt = this; elt != nullptr;
+    for (auto elt = dynamic_cast<const Named*>(type_); elt != nullptr;
          elt = dynamic_cast<const Named*>(elt->type_))
       {
         if (elt == this)

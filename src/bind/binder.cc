@@ -224,6 +224,7 @@ namespace bind
     (*this)(e.vardec_get());
     (*this)(e.hi_get());
     (*this)(e.body_get());
+    break_stack.pop();
     this->sm.scope_end();
   }
 
@@ -232,6 +233,7 @@ namespace bind
     break_stack.push(&e);
     (*this)(e.test_get());
     (*this)(e.body_get());
+    break_stack.pop();
   }
 
   void Binder::operator()(ast::SimpleVar& e)
@@ -341,14 +343,14 @@ namespace bind
 
   void Binder::operator()(ast::BreakExp& e)
   {
-    ast::Exp* brk = break_stack.top();
-    if (brk == nullptr)
+    if (break_stack.size() == 0)
       {
         this->error_ << misc::error::error_type::bind << e.location_get()
                      << ": bind error, 'break' outside any loop\n";
+        return;
       }
+    ast::Exp* brk = break_stack.top();
     e.def_set(brk);
-    break_stack.pop();
   }
 
   void Binder::operator()(ast::LetExp& e)

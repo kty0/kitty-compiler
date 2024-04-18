@@ -81,7 +81,7 @@ namespace type
                                 const Type& type2)
   {
     // FIXED: Some code was deleted here (Check for type mismatch).
-    if (!type1.compatible_with(type2))
+    if (!type1.actual().compatible_with(type2.actual()))
       {
         type_mismatch(ast, exp1, type1, exp2, type2);
       }
@@ -136,7 +136,7 @@ namespace type
   void TypeChecker::operator()(ast::FieldVar& e)
   {
     const type::Record* record_type =
-      dynamic_cast<const type::Record*>(type(e.var_get()));
+      dynamic_cast<const type::Record*>(&type(e.var_get())->actual());
     if (record_type == nullptr)
       {
         error(e, "var must be a record");
@@ -160,7 +160,7 @@ namespace type
     check_types(e, "index", *type(e.index_get()), "expected", Int::instance());
 
     const type::Array* array_type =
-      dynamic_cast<const type::Array*>(type(e.var_get()));
+      dynamic_cast<const type::Array*>(&type(e.var_get())->actual());
     if (array_type == nullptr)
       {
         error(e, "var must be an array");
@@ -168,7 +168,7 @@ namespace type
         return;
       }
 
-    e.type_set(e.var_get().type_get());
+    type_default(e, &array_type->type_get());
   }
 
   /*-----------------.
@@ -196,12 +196,11 @@ namespace type
   }
 
   // Complex values.
-
   void TypeChecker::operator()(ast::RecordExp& e)
   {
     // FIXED: Some code was deleted here.
     const type::Record* record_type =
-      dynamic_cast<const type::Record*>(type(e.type_name_get()));
+      dynamic_cast<const type::Record*>(&type(e.type_name_get())->actual());
     if (record_type == nullptr)
       {
         error(e, "type should be a record");
@@ -210,7 +209,7 @@ namespace type
       }
 
     auto fields = e.fields_get();
-    for (int i = 0; i < fields.size(); i++)
+    for (size_t i = 0; i < fields.size(); i++)
       {
         check_types(e, "field", *type(fields[i]->init_get()), "expected",
                     record_type->fields_get()[i].type_get());
@@ -222,10 +221,20 @@ namespace type
   void TypeChecker::operator()(ast::OpExp& e)
   {
     // FIXED: Some code was deleted here.
-    check_types(e, "left operand", e.left_get(), "right operand",
-                e.right_get());
+    ast::OpExp::Oper op = e.oper_get();
 
-    type_default(e, e.left_get().type_get());
+    if (op == ast::OpExp::Oper::add || op == ast::OpExp::Oper::sub || op == ast::OpExp::Oper::mul || op == ast::OpExp::Oper::div) // Arithmetic operations
+      {
+        check_types(e, "left operand", *type(e.left_get()), "expected", Int::instance());
+        check_types(e, "right operand", *type(e.right_get()), "expected", Int::instance());
+      }
+    else // Comparisons
+      {
+        check_types(e, "left operand", e.left_get(), "right operand",
+            e.right_get());
+      }
+
+    type_default(e, &Int::instance());
   }
 
   // FIXED: Some code was deleted here.
@@ -235,11 +244,12 @@ namespace type
     check_types(e, "size clause", *type(e.size_get()), "expected",
                 Int::instance());
 
-    const Array *array_type = dynamic_cast<const Array *>(type(e.type_name_get()));
+    const Array *array_type = dynamic_cast<const Array *>(&type(e.type_name_get())->actual());
     if (array_type == nullptr)
       {
         error(e, "expected array type");
         type_default(e, &Int::instance());
+        return;
       }
 
     check_types(e, "array", array_type->type_get(), "initializing",
@@ -250,15 +260,28 @@ namespace type
 
   void TypeChecker::operator()(ast::ForExp& e)
   {
+    e.vardec_get().read_only_set(true);
+
     check_types(e, "counter", *type(e.vardec_get()), "expected",
                 Int::instance());
+
     check_types(e, "bound", *type(e.hi_get()), "expected", Int::instance());
 
     check_types(e, "body", *type(e.body_get()), "expected", Void::instance());
+
+    type_default(e, &Void::instance());
   }
 
   void TypeChecker::operator()(ast::AssignExp& e)
   {
+    ast::SimpleVar *simplevar = dynamic_cast<ast::SimpleVar *>(&e.var_get());
+    if (simplevar && simplevar->def_get()->read_only_get())
+      {
+        error(e, "variable is read only");
+        type_default(e, &Int::instance());
+        return;
+      }
+
     check_types(e, "variable", *type(e.var_get()), "expression",
                 *type(e.exp_get()));
 
@@ -307,7 +330,7 @@ namespace type
         return;
       }
 
-    for (int i = 0; i < fields.size(); i++)
+    for (size_t i = 0; i < fields.size(); i++)
       {
         check_types(e, "argument", *type(*exps[i]), "expected",
                     fields[i].type_get());
@@ -400,28 +423,31 @@ namespace type
   void TypeChecker::operator()(ast::VarDec& e)
   {
     // FIXED: Some code was deleted here.
+    if (e.type_name_get() != nullptr)
+      {
+        type_default(e, type(*e.type_name_get()));
+      }
+
     if (e.init_get() == nullptr)
       {
-        const type::Type* namety_type = type(*e.type_name_get());
-
-        type_default(e, namety_type);
         return;
       }
 
     const type::Type *exp_type = type(*e.init_get());
 
-    if (e.type_name_get() != nullptr)
+    if (e.type_name_get() == nullptr)
       {
-        const type::Type* namety_type = type(*e.type_name_get());
+        if (dynamic_cast<const Nil *>(exp_type))
+          {
+            error(e, "assigning nil to untyped var");
+          }
 
-        check_types(e, "type", *namety_type, "expression", *exp_type);
+        type_default(e, exp_type);
       }
-    else if (dynamic_cast<const Nil *>(exp_type))
+    else
       {
-        error(e, "assigning nil to untyped var");
+        check_types(e, "type", *e.type_get(), "expression", *exp_type);
       }
-
-    type_default(e, exp_type);
   }
 
   /*--------------------.
@@ -454,7 +480,15 @@ namespace type
   template <> void TypeChecker::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
   {
     // FIXED: Some code was deleted here.
-    e.type_set(type(e.ty_get()));
+    const Named *named_type = dynamic_cast<const Named *>(e.type_get());
+    if (named_type == nullptr)
+      {
+        error(e, "TypeDec ill-typed somehow");
+        e.type_set(&Int::instance());
+        return;
+      }
+
+    named_type->type_set(type(e.ty_get()));
   }
 
   /*------------------.
@@ -471,6 +505,15 @@ namespace type
     for (const auto dec : e)
       {
         visit_dec_body<D>(*dec);
+      }
+    for (const auto dec : e)
+      {
+        const Named *named_type = dynamic_cast<const Named *>(dec->type_get());
+        if (named_type != nullptr && !named_type->sound())
+        {
+          error(e, "recursive inheritance");
+          return;
+        }
       }
   }
 

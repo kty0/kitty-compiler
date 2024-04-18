@@ -33,7 +33,19 @@ namespace bind
       }
   }
 
-  void Renamer::operator()(ast::FunctionDec& e)
+  void Renamer::operator()(ast::FunctionChunk& e)
+  {
+    chunk_visit<ast::FunctionDec>(e);
+  }
+
+  void Renamer::operator()(ast::FunctionDec&)
+  {
+    // We must not be here.
+    unreachable();
+  }
+
+  template <>
+  void Renamer::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e)
   {
     (*this)(e.formals_get());
 
@@ -52,14 +64,30 @@ namespace bind
         // Add the new name to the FunctionDec
         e.name_set(sym);
       }
+  }
 
+  template <>
+  void Renamer::visit_dec_body<ast::FunctionDec>(ast::FunctionDec& e)
+  {
     if (e.body_get() != nullptr)
       {
         (*this)(e.body_get());
       }
   }
 
-  void Renamer::operator()(ast::TypeDec& e)
+  void Renamer::operator()(ast::TypeChunk& e)
+  {
+    chunk_visit<ast::TypeDec>(e);
+  }
+
+  void Renamer::operator()(ast::TypeDec&)
+  {
+    // We must not be here.
+    unreachable();
+  }
+
+  template <>
+  void Renamer::visit_dec_header<ast::TypeDec>(ast::TypeDec& e)
   {
     // Make the new name
     std::string name = e.name_get().get() + "_" + std::to_string(count);
@@ -68,7 +96,24 @@ namespace bind
     count++;
     // Add the new name to the TypeDec
     e.name_set(sym);
+  }
+
+  template <>
+  void Renamer::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
+  {
     (*this)(e.ty_get());
+  }
+
+  template <class D> void Renamer::chunk_visit(ast::Chunk<D>& e)
+  {
+    for (const auto dec : e)
+      {
+        visit_dec_header<D>(*dec);
+      }
+    for (const auto dec : e)
+      {
+        visit_dec_body<D>(*dec);
+      }
   }
 
   void Renamer::operator()(ast::MethodDec& e)

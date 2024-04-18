@@ -16,4 +16,7 @@ namespace ast
   inline const Exp* VarDec::init_get() const { return init_; }
   inline Exp* VarDec::init_get() { return init_; }
 
+  inline bool VarDec::read_only_get() const { return read_only; }
+  inline void VarDec::read_only_set(bool status) { this->read_only = status; }
+
 } // namespace ast

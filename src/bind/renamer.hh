@@ -41,6 +41,8 @@ namespace bind
     void operator()(ast::FunctionDec& e) override;
     void operator()(ast::VarDec& e) override;
     void operator()(ast::MethodDec& e) override;
+    void operator()(ast::FunctionChunk& e) override;
+    void operator()(ast::TypeChunk& e) override;
     /// \}
 
     /// \name Visiting usage sites.
@@ -52,11 +54,23 @@ namespace bind
     void operator()(ast::MethodCallExp& e) override;
     /// \}
 
+    template <class D> void chunk_visit(ast::Chunk<D>& e);
+
+    template <class D> void visit_dec_header(D& e);
+    template <class D> void visit_dec_body(D& e);
+
   private:
     // FIXED: Some code was deleted here.
     int count = 0;
   };
 
+  template <>
+  void Renamer::visit_dec_header<ast::FunctionDec>(ast::FunctionDec& e);
+  template <>
+  void Renamer::visit_dec_body<ast::FunctionDec>(ast::FunctionDec& e);
+
+  template <> void Renamer::visit_dec_header<ast::TypeDec>(ast::TypeDec& e);
+  template <> void Renamer::visit_dec_body<ast::TypeDec>(ast::TypeDec& e);
 } // namespace bind
 
 #include <bind/renamer.hxx>

@@ -51,11 +51,18 @@ namespace ast
     Exp* init_get();
     /** \} */
 
+    /// Return whether the variable is read-only or not.
+    bool read_only_get() const;
+    /// Allows setting whether the variable is read-only or not.
+    void read_only_set(bool status);
+
   protected:
     /// Optional type of the declared variable.
     NameTy* type_name_;
     /// The initial value (expression) assigned to the variable.
     Exp* init_;
+    /// Whether the variable is read-only or not (useful for for-loops).
+    bool read_only = false;
   };
 } // namespace ast
 #include <ast/var-dec.hxx>

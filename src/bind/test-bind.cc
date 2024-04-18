@@ -16,6 +16,7 @@ static bool bound(const std::string& s)
   ast::ChunkList* d = parse::parse_unit(s);
   misc::error e;
   // FIXME: Some code was deleted here (Run the binder).
+  e << bind::bind(*d);
   std::cout << *d << '\n';
   if (e)
     std::cerr << "error-->" << e << '\n';

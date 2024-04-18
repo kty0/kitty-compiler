@@ -23,7 +23,7 @@ namespace type
   bool Nil::compatible_with(const Type& other) const
   {
     // FIXED: Some code was deleted here.
-    if (dynamic_cast<const Record*>(&other.actual()) || this->actual() == other)
+    if (dynamic_cast<const Record*>(&other.actual()) || *this == other)
       {
         return true;
       }

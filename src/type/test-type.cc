@@ -50,10 +50,9 @@ int main()
   const Nil n{};
   ASSERT(dynamic_cast<const Nil*>(&n.actual()));
   ASSERT(Rec.compatible_with(n));
-//  ASSERT(n.compatible_with(Rec));
+  ASSERT(n.compatible_with(Rec));
 
-/*
+
   ASSERT(!Rec.compatible_with(Int::instance()));
   ASSERT(!Int::instance().compatible_with(Rec));
-  */
 }

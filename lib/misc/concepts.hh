@@ -59,8 +59,8 @@ namespace misc
   // Concept describing a ConstIterable but adds a constraint on the value_type
   // the held type should be convertible into T
   template <typename Container, typename T>
-  concept ConstIterableType = ConstIterable<
-    Container> && std::convertible_to<typename Container::value_type, T>;
+  concept ConstIterableType = ConstIterable<Container>
+    && std::convertible_to<typename Container::value_type, T>;
 
   // Concept describing an Iterable but adds a constraint on the value_type
   // the held type should be convertible into T
@@ -68,7 +68,6 @@ namespace misc
   concept IterableType =
     Iterable<Container> && std::convertible_to<typename Container::value_type,
                                                T>;
-
   // Concept describing an iterator on a type T
   template <typename Iter, typename T>
   concept Iterator =

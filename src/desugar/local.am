@@ -15,5 +15,13 @@ check_PROGRAMS +=                                                              \
 %C%_test_for_loops_desugar_LDADD = src/libtc.la
 %C%_test_for_loops_desugar_CPPFLAGS = $(AM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 
+src_libtc_la_SOURCES +=           \
+  %D%/bounds-checking-visitor.hh %D%/bounds-checking-visitor.cc
+
+check_PROGRAMS +=                 \
+  %D%/test-bounds-checking
+
+%C%_test_bounds_checking_LDADD = src/libtc.la
+%C%_test_bounds_checking_CPPFLAGS = $(AM_CPPFLAGS) -DPKGDATADIR=\"$(pkgdatadir)\"
 
 TASKS += %D%/tasks.hh %D%/tasks.cc

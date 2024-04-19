@@ -71,3 +71,17 @@ tcsh/python/.deps/
 tcsh/python/Makefile.in
 tcsh/python/swig.mk
 tests/Makefile.in
+config.h.in~
+files.sh
+simple-for-loop.tig
+src/callgraph/.deps/
+src/callgraph/.dirstamp
+src/combine/.deps/
+src/combine/.dirstamp
+src/inlining/.deps/
+src/inlining/.dirstamp
+src/overload/.deps/
+src/overload/.dirstamp
+src/parse/location.hh.bak
+src/parse/parsetiger.hh.bak
+

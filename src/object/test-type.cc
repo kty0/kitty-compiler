@@ -15,7 +15,7 @@ const char* program_name = "test-type";
 inline static bool typed(const std::string& s)
 {
   ast::ChunkList* d = parse::parse_unit(s, true);
-  //object::bind(*d);
+  // object::bind(*d);
   misc::error e = object::types_check(*d);
   std::cout << *d << '\n';
   if (e)

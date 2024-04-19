@@ -60,7 +60,7 @@ namespace
   };
 } // namespace
 
-PyObject* get_swig_real_ast_type(const ast::Ast& e)
+PyObject *get_swig_real_ast_type(const ast::Ast& e)
 {
   SwigAstTypeVisitor stv;
   e.accept(stv);

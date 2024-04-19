@@ -32,4 +32,18 @@ namespace desugar::tasks
                     desugar_for_p, desugar_string_cmp_p);
   }
 
+  /*-----------------------.
+    | Array bounds checking.  |
+    `-----------------------*/
+
+  void bounds_checks_add()
+  {
+    astclone::apply(::desugar::bounds_checks_add, ast::tasks::the_program);
+  }
+
+  void raw_bounds_checks_add()
+  {
+    astclone::apply(::desugar::raw_bounds_checks_add, ast::tasks::the_program);
+  }
+
 } // namespace desugar::tasks

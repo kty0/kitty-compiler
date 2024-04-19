@@ -13,7 +13,9 @@ namespace type
 {
   Class::Class(const Class* super)
     : Type()
+//    , id_(fresh_id())
     , super_(super)
+    , subclasses_()
   {}
 
   void Class::accept(ConstVisitor& v) const { v(*this); }

@@ -16,6 +16,7 @@ namespace type::tasks
                            "default the type-checking to Tiger "
                            "(without objects nor overloading)",
                            "types-compute"
+                           " combine-types-compute"
                            " object-types-compute");
 
   /// Check for type violation.

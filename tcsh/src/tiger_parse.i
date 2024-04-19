@@ -23,6 +23,7 @@
 %template(MetavarVar) parse::MetavarMap<ast::Var>;
 %template(MetavarNameTy) parse::MetavarMap<ast::NameTy>;
 %template(MetavarChunkList) parse::MetavarMap<ast::ChunkList>;
+%template(MetavarTweast) parse::MetavarMap<parse::Tweast>;
 
 /*------------------.
 | parse::position.  |

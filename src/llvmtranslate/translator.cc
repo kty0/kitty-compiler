@@ -97,29 +97,53 @@ namespace llvmtranslate
   {
     if (auto var_ast = dynamic_cast<const ast::SimpleVar*>(&e))
       {
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        llvm::Value* def = locals_[current_function_][var_ast->def_get()];
+        return def;
       }
+
     else if (auto arr_ast = dynamic_cast<const ast::SubscriptVar*>(&e))
       {
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        llvm::Type* sub_type = llvm_type(*e.type_get());
+        auto array = translate(arr_ast->var_get());
+        auto index = translate(arr_ast->index_get());
+        return builder_.CreateGEP(sub_type, array, index,
+                                  "subscriptptr_"s + array->getName().str());
       }
     else if (auto field_ast = dynamic_cast<const ast::FieldVar*>(&e))
       {
         const ast::Var* var = nullptr;
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        var = &field_ast->var_get();
         auto var_val = translate(*var);
 
         const type::Record* record_type = nullptr;
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+
+        record_type = dynamic_cast<const type::Record*>(var->type_get());
+
         misc::symbol field_name;
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        field_name = field_ast->name_get();
+
         int index = -1;
-        // FIXME: Some code was deleted here (Get the index of the field).
+        // FIXED: Some code was deleted here (Get the index of the field).
+        for (size_t i = 0; i < record_type->fields_get().size(); i++)
+          {
+            if (record_type->fields_get()[i].name_get() == field_name)
+              {
+                index = i;
+                break;
+              }
+          }
 
         // The GEP instruction provides us with safe pointer arithmetics,
         // usually used with records or arrays.
         llvm::Type* record_ltype = nullptr;
-        // FIXME: Some code was deleted here (Get record's corresponding LLVM type).
+        // FIXED: Some code was deleted here (Get record's corresponding LLVM type).
+        record_ltype = llvm_type(*field_ast->type_get());
+
         return builder_.CreateStructGEP(record_ltype, var_val, index,
                                         "fieldptr_"s + field_name.get());
       }
@@ -188,7 +212,8 @@ namespace llvmtranslate
         for (const auto dec : escapes)
           {
             llvm::Type* var_ltype = nullptr;
-            // FIXME: Some code was deleted here (Get the llvm type of the VarDec).
+            // FIXED: Some code was deleted here (Get the llvm type of the VarDec).
+            var_ltype = llvm_type(*dec->type_get());
             args_types.emplace_back(llvm::PointerType::getUnqual(var_ltype));
           }
       }
@@ -200,8 +225,16 @@ namespace llvmtranslate
       args_types.emplace_back(llvm_type(field.type_get()));
 
     llvm::Type* result_ltype = nullptr;
-    // FIXME: Some code was deleted here (If the result is void typed, we assign llvm void type to result_ltype).
-    result_ltype = llvm_type(function_type.result_get());
+    // FIXED: Some code was deleted here (If the result is void typed, we assign llvm void type to result_ltype).
+
+    if (dynamic_cast<const type::Void*>(&function_type.result_get()))
+      {
+        result_ltype = llvm::Type::getVoidTy(ctx_);
+      }
+    else
+      {
+        result_ltype = llvm_type(function_type.result_get());
+      }
 
     return llvm::FunctionType::get(result_ltype, args_types, false);
   }
@@ -209,39 +242,59 @@ namespace llvmtranslate
   void Translator::operator()(const ast::SimpleVar& e)
   {
     // Void var types are actually Ints represented by a 0
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (dynamic_cast<const type::Void*>(e.type_get()))
+      {
+        value_ = builder_.CreateLoad(llvm::Type::getInt32Ty(ctx_), 0,
+                                     e.name_get().get());
+      }
+    else
+      {
+        value_ = builder_.CreateLoad(llvm_type(*e.type_get()), access_var(e),
+                                     e.name_get().get());
+      }
   }
 
   void Translator::operator()(const ast::FieldVar& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    value_ = access_var(e);
   }
 
   void Translator::operator()(const ast::SubscriptVar& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    value_ = access_var(e);
   }
 
   void Translator::operator()(const ast::NilExp& e)
   {
-    // FIXME: Some code was deleted here (Get the record_type of the Nil type, and create a null pointer).
+    // FIXED: Some code was deleted here (Get the record_type of the Nil type, and create a null pointer).
+    auto record_type = dynamic_cast<const type::Record*>(e.type_get());
+    llvm::Type* rec_type = llvm_type(*record_type);
+    value_ =
+      llvm::ConstantPointerNull::get(llvm::PointerType::get(rec_type, 0));
   }
 
   void Translator::operator()(const ast::IntExp& e)
   {
-    // FIXME: Some code was deleted here (Integers in Tiger are all 32bit signed).
+    // FIXED: Some code was deleted here (Integers in Tiger are all 32bit signed).
+    value_ = llvm::ConstantInt::getSigned(i32_t(ctx_), e.value_get());
   }
 
   void Translator::operator()(const ast::StringExp& e)
   {
-    // FIXME: Some code was deleted here (Strings are translated as `i8*` values, like C's `char*`).
+    // FIXED: Some code was deleted here (Strings are translated as `i8*` values, like C's `char*`).
+    value_ =
+      builder_.CreateGlobalStringPtr(e.value_get(), "string");
   }
 
   void Translator::operator()(const ast::RecordExp& e)
   {
     // Get the record type
     const type::Record* record_type = nullptr;
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    record_type = dynamic_cast<const type::Record*>(e.type_get());
 
     // Type the record and use get_record_ltype() to get its LLVM type
     llvm_type(*record_type);
@@ -263,14 +316,58 @@ namespace llvmtranslate
     builder_.Insert(malloc_val, "malloccall");
 
     // Init the fields
-    // FIXME: Some code was deleted here.
-
+    // FIXED: Some code was deleted here.
+    for (int i = 0; i < e.fields_get().size(); i++)
+      {
+        llvm::Type* type = llvm_type(*e.fields_get()[i]->init_get().type_get());
+        llvm::Value* val = builder_.CreateStructGEP(type, malloc_val, i);
+        llvm::StoreInst* store = builder_.CreateStore(val, malloc_val);
+      }
     value_ = malloc_val;
   }
 
   void Translator::operator()(const ast::OpExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    llvm::Value* l_val = translate(e.left_get());
+    llvm::Value* r_val = translate(e.right_get());
+
+    switch (e.oper_get())
+      {
+      case ast::OpExp::Oper::add:
+        value_ = builder_.CreateAdd(l_val, r_val, "addtmp");
+        break;
+      case ast::OpExp::Oper::sub:
+        value_ = builder_.CreateSub(l_val, r_val, "subtmp");
+        break;
+      case ast::OpExp::Oper::mul:
+        value_ = builder_.CreateMul(l_val, r_val, "multmp");
+        break;
+      case ast::OpExp::Oper::div:
+        value_ = builder_.CreateSDiv(l_val, r_val, "divtmp");
+        break;
+      case ast::OpExp::Oper::eq:
+        value_ = builder_.CreateICmpEQ(l_val, r_val, "eqtmp");
+        break;
+      case ast::OpExp::Oper::ne:
+        value_ = builder_.CreateICmpNE(l_val, r_val, "netmp");
+        break;
+      case ast::OpExp::Oper::lt:
+        value_ = builder_.CreateICmpSLT(l_val, r_val, "lttmp");
+        break;
+      case ast::OpExp::Oper::le:
+        value_ = builder_.CreateICmpSLE(l_val, r_val, "letmp");
+        break;
+      case ast::OpExp::Oper::gt:
+        value_ = builder_.CreateICmpSGT(l_val, r_val, "gttmp");
+        break;
+      case ast::OpExp::Oper::ge:
+        value_ = builder_.CreateICmpSGE(l_val, r_val, "getmp");
+        break;
+      default:
+        break;
+      }
+
     // The comparison instructions returns an i1, and we need an i32, since everything
     // is an i32 in Tiger. Use a zero-extension to avoid this.
     value_ = builder_.CreateZExtOrTrunc(value_, i32_t(ctx_), "op_zext");
@@ -280,17 +377,63 @@ namespace llvmtranslate
   {
     // An empty SeqExp is an empty expression, so we should return an int
     // containing 0, since its type is void.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (e.exps_get().empty())
+      {
+        value_ = llvm::ConstantInt::get(i32_t(ctx_), 0);
+      }
+    else
+      {
+        super_type::operator()(e);
+      }
   }
 
   void Translator::operator()(const ast::AssignExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    auto value = translate(e.exp_get());
+    auto var = access_var(e.var_get());
+    value_ = builder_.CreateStore(value, var);
   }
 
   void Translator::operator()(const ast::IfExp& e)
   {
-    // FIXME: Some code was deleted here (IfExps are handled in a similar way to Kaleidoscope (see LangImpl5.html)).
+    // FIXED: Some code was deleted here (IfExps are handled in a similar way to Kaleidoscope (see LangImpl5.html)).
+
+    llvm::Value* condv = builder_.CreateFCmpONE(
+      translate(e.test_get()), llvm::ConstantFP::get(ctx_, llvm::APFloat(0.0)),
+      "ifcond");
+
+    llvm::Function* TheFunction = builder_.GetInsertBlock()->getParent();
+    llvm::BasicBlock* ThenBB =
+      llvm::BasicBlock::Create(ctx_, "then", TheFunction);
+    llvm::BasicBlock* ElseBB = llvm::BasicBlock::Create(ctx_, "else");
+    llvm::BasicBlock* MergeBB = llvm::BasicBlock::Create(ctx_, "ifcont");
+
+    builder_.CreateCondBr(condv, ThenBB, ElseBB);
+
+    builder_.SetInsertPoint(ThenBB);
+
+    llvm::Value* ThenV = translate(e.thenclause_get());
+
+    builder_.CreateBr(MergeBB);
+    ThenBB = builder_.GetInsertBlock();
+
+    TheFunction->getBasicBlockList().push_back(ElseBB);
+    builder_.SetInsertPoint(ElseBB);
+
+    llvm::Value* ElseV = translate(e.elseclause_get());
+
+    builder_.CreateBr(MergeBB);
+    ElseBB = builder_.GetInsertBlock();
+
+    TheFunction->getBasicBlockList().push_back(MergeBB);
+    builder_.SetInsertPoint(MergeBB);
+    llvm::PHINode* PN =
+      builder_.CreatePHI(llvm::Type::getDoubleTy(ctx_), 2, "iftmp");
+
+    PN->addIncoming(ThenV, ThenBB);
+    PN->addIncoming(ElseV, ElseBB);
   }
 
   void Translator::operator()(const ast::WhileExp& e)
@@ -331,7 +474,10 @@ namespace llvmtranslate
 
   void Translator::operator()(const ast::BreakExp& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    auto block = e.def_get();
+    value_ = builder_.CreateBr(
+      loop_end_[dynamic_cast<const ast::WhileExp*>(e.def_get())]);
   }
 
   void Translator::operator()(const ast::ArrayExp& e)
@@ -339,14 +485,18 @@ namespace llvmtranslate
     // Translate the number of elements,
     // fill the array with the default value, then
     // return the pointer to the allocated zone.
-    // FIXME: Some code was deleted here (Use `init_array`).
+    // FIXED: Some code was deleted here (Use `init_array`).
+    auto nb_elts = translate(e.size_get());
+    llvm::Value* arr = translate(e.init_get());
+    value_ = init_array(nb_elts, arr);
   }
 
   void Translator::operator()(const ast::CastExp& e)
   {
     auto exp_val = translate(e.exp_get());
     llvm::Type* ltype = nullptr;
-    // FIXME: Some code was deleted here (Destination llvm type).
+    // FIXED: Some code was deleted here (Destination llvm type).
+    ltype = llvm_type(*e.ty_get().type_get());
     value_ = builder_.CreateBitCast(exp_val, ltype, "cast_exp");
   }
 
@@ -368,7 +518,8 @@ namespace llvmtranslate
     auto name = function_dec_name(e);
 
     const type::Type* node_type = nullptr;
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    node_type = e.type_get();
     auto& function_type = static_cast<const type::Function&>(*node_type);
     auto function_ltype = llvm_function_type(function_type);
 
@@ -411,7 +562,8 @@ namespace llvmtranslate
     builder_.SetInsertPoint(bb);
 
     const type::Type* node_type = nullptr;
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    node_type = e.type_get();
     auto& function_type = static_cast<const type::Function&>(*node_type);
     auto& escaped = escaped_[&function_type];
     auto& formals = e.formals_get();
@@ -424,9 +576,27 @@ namespace llvmtranslate
         ++arg_it;
       }
 
-    // FIXME: Some code was deleted here (Create alloca instructions for each variable).
+    // FIXED: Some code was deleted here (Create alloca instructions for each variable).
+    for (const auto var : formals)
+      {
+        auto var_ltype = llvm_type(*var->type_get());
+        auto val =
+          builder_.CreateAlloca(var_ltype, nullptr, var->name_get().get());
+        locals_[current_function_][var] = val;
+        builder_.CreateStore(&*arg_it, val);
+        ++arg_it;
+      }
 
-    // FIXME: Some code was deleted here (Create a return instruction).
+    // FIXED: Some code was deleted here (Create a return instruction).
+    if (!e.result_get())
+      {
+        translate(*e.body_get());
+        builder_.CreateRetVoid();
+      }
+    else
+      {
+        builder_.CreateRet(translate(*e.body_get()));
+      }
 
     // Validate the generated code, checking for consistency.
     llvm::verifyFunction(*the_function);
@@ -443,13 +613,54 @@ namespace llvmtranslate
     //
     // Then, add the escaped variables and the rest of the arguments to the
     // list of arguments, and return the correct value.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    std::string name = function_dec_name(*e.def_get());
+    llvm::Type* callexptype = llvm_type(*e.type_get());
+    auto func = module_.getFunction(name);
+    std::vector<llvm::Value*> arguments;
+
+    const type::Type* node_type = nullptr;
+    node_type = e.type_get();
+    auto& function_type = static_cast<const type::Function&>(*node_type);
+    auto& escaped = escaped_[&function_type];
+
+    for (const auto var : escaped)
+      {
+        arguments.push_back(locals_[current_function_][var]);
+      }
+
+    for (const auto& a : e.args_get())
+      {
+        arguments.push_back(translate(*a));
+      }
+
+    if (*e.type_get() == type::Void::instance())
+    {
+      value_ = builder_.CreateCall(func, arguments);
+    }
+    else
+    {
+      value_ = builder_.CreateCall(func, arguments, "call_" + name);
+    }
   }
 
   void Translator::operator()(const ast::VarDec& e)
   {
     // Void var types are actually Ints represented by a 0
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    if (dynamic_cast<const type::Void*>(e.type_get()))
+      {
+        value_ = builder_.CreateAlloca(llvm::Type::getInt32Ty(ctx_), 0,
+                                       e.name_get().get());
+      }
+    else
+      {
+        value_ = builder_.CreateAlloca(llvm_type(*e.type_get()), nullptr,
+                                       e.name_get().get());
+      }
+
+    locals_[current_function_][&e] = value_;
+    builder_.CreateStore(translate(*e.init_get()), value_);
   }
 
 } // namespace llvmtranslate

@@ -66,6 +66,8 @@ namespace escapes
   private:
     // @ of the variable declaration and his scope-level
     std::map<ast::VarDec*, int> scope_var;
+    // to store the current function during visiting
+    ast::FunctionDec* current_function_ = nullptr;
   };
 
 } // namespace escapes

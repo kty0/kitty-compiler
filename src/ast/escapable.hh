@@ -15,15 +15,18 @@ namespace ast
     // FIXED: Some code was deleted here.
 
   public:
-    void set_escaped();
-    void set_unescaped();
+    void escaped_set();
+    void unescaped_set();
     bool is_locked() const;
     bool is_escaped() const;
+    ast::FunctionDec* def_site_get() const;
+    void def_site_set(ast::FunctionDec* e);
 
   private:
     // FIXED: Some code was deleted here.
-    bool escaped = true; // by default, variables are escaped
-    bool locked = false;
+    bool escaped_ = true; // by default, variables are escaped
+    bool locked_ = false;
+    ast::FunctionDec* def_site_ = nullptr;
   };
 } // namespace ast
 #include <ast/escapable.hxx>

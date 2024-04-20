@@ -37,7 +37,8 @@ namespace llvmtranslate
 
   void LLVMTypeVisitor::operator()(const type::Void&)
   {
-    // FIXME: Some code was deleted here (Void types can be interpreted as int or void type).
+    // FIXED: Some code was deleted here (Void types can be interpreted as int or void type).
+    type_ = llvm::Type::getVoidTy(ctx_);
   }
 
   void LLVMTypeVisitor::operator()(const type::Int&)
@@ -48,12 +49,16 @@ namespace llvmtranslate
   void LLVMTypeVisitor::operator()(const type::String&)
   {
     // Strings are pointers to characters in LLVM.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    type_ = llvm::Type::getInt8PtrTy(ctx_);
+
   }
 
   void LLVMTypeVisitor::operator()(const type::Named& e)
   {
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    auto type = e.type_get();
+    type_ = llvm_type(*type);
   }
 
   void LLVMTypeVisitor::operator()(const type::Record& e)
@@ -68,7 +73,11 @@ namespace llvmtranslate
         // Then set the body of the structure
         std::vector<llvm::Type*> field_types;
         field_types.reserve(e.fields_get().size());
-        // FIXME: Some code was deleted here.
+        // FIXED: Some code was deleted here.
+        for (type::Field field : e.fields_get())
+        {
+            field_types.push_back(llvm_type(field.type_get()));
+        }
         structs_[&e]->setBody(std::move(field_types), false);
       }
 
@@ -78,7 +87,8 @@ namespace llvmtranslate
   void LLVMTypeVisitor::operator()(const type::Array& e)
   {
     // Arrays are pointers to the array elements, like in C.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    type_ = llvm::PointerType::getUnqual(llvm_type(e.type_get().actual()));
   }
 
 } // namespace llvmtranslate

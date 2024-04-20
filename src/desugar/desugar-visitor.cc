@@ -121,7 +121,7 @@ namespace desugar
        is done to prevent overflows on INT_MAX.
        ->>*/
 
-  void DesugarVisitor::operator()(const ast::ForExp& e)
+  void BoundsCheckingVisitor::operator()(const ast::Array& e)
   {
     // FIXED: Some code was deleted here.
     if (!desugar_for_p_)

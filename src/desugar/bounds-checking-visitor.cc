@@ -27,5 +27,24 @@ namespace desugar
   `-----------------------*/
 
   // FIXME: Some code was deleted here.
+  void DesugarVisitor::operator()(const ast::ArrayTy& e)
+  {
+    if (!desugar_for_p_)
+      {
+        super_type::operator()(e);
+      }
+    else
+      {
+        parse::Tweast tweast;
+
+        tweast << "type _box_string_array_17 = {
+            arr : string_array_17,
+            size : int
+        }"
+
+        ast::Exp *res = parse::parse(tweast);
+        result_ = res;
+      }
+  }
 
 } // namespace desugar

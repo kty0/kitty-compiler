@@ -49,25 +49,64 @@ namespace llvmtranslate
     void operator()(const ast::FunctionDec& e) override
     {
       // Keep track of the current function
-      // FIXME: Some code was deleted here.
+      // FIXED: Some code was deleted here.
+      auto previous_function = current_function_;
+      current_function_ = &e;
+      super_type::operator()(e);
+      current_function_ = previous_function;
     }
 
     void operator()(const ast::CallExp& e) override
     {
       super_type::operator()(e);
 
-      // FIXME: Some code was deleted here.
+      // FIXED: Some code was deleted here.
+      auto call_func =
+        dynamic_cast<const type::Function*>(e.def_get()->type_get());
 
-      // Check whether there are any newly collected escaped variables.
-      // If there are, mark the iteration as modified.
-      // FIXME: Some code was deleted here.
+      if (escaped_.contains(call_func)) // if the function is found in the map
+        {
+          const type::Function* function =
+            dynamic_cast<const type::Function*>(current_function_->type_get());
+
+          // Check whether there are any newly collected escaped variables.
+          // If there are, mark the iteration as modified.
+          // FIXED: Some code was deleted here.
+          for (auto& esc : escaped_[call_func])
+            {
+              /*
+               * if the escaped variable used in the function of the callexp
+               * has the same definition site as the address as the current function ?
+               * YES : do nothing
+               * NO : add the current function and the variable in escaped_ and
+               *      mark the iteration as modified
+               */
+              if (esc->def_site_get() != current_function_)
+                {
+                  if (escaped_[function].contains(esc))
+                  {
+                    continue;
+                  }
+
+                  escaped_[function].insert(esc);
+                  did_modify_ = true;
+                }
+            }
+        }
     }
 
     void operator()(const ast::SimpleVar& e) override
     {
       // Associate escaped variables declared in parent frames with their
       // functions
-      // FIXME: Some code was deleted here.
+      // FIXED: Some code was deleted here.
+      const type::Function* function =
+        dynamic_cast<const type::Function*>(current_function_->type_get());
+
+      if (e.def_get()->is_escaped())
+        {
+          escaped_[function].insert(e.def_get());
+        }
     }
 
   private:
@@ -78,7 +117,8 @@ namespace llvmtranslate
     escaped_map_type escaped_;
 
     /// Current visiting function.
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    const ast::FunctionDec* current_function_ = nullptr;
   };
 
   escaped_map_type collect_escapes(const ast::Ast& ast)

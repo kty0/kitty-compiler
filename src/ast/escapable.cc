@@ -9,12 +9,17 @@
 namespace ast
 {
   // FIXED: Some code was deleted here.
-  void Escapable::set_escaped()
+  void Escapable::escaped_set()
   {
-    this->escaped = true;
-    this->locked = true;
+    this->escaped_ = true;
+    this->locked_ = true;
   }
-  void Escapable::set_unescaped() { this->escaped = false; }
-  bool Escapable::is_locked() const { return locked; }
-  bool Escapable::is_escaped() const { return escaped; }
+  void Escapable::unescaped_set() { this->escaped_ = false; }
+  bool Escapable::is_locked() const { return this->locked_; }
+  bool Escapable::is_escaped() const { return this->escaped_; }
+
+  ast::FunctionDec* Escapable::def_site_get() const { return this->def_site_; }
+
+  void Escapable::def_site_set(ast::FunctionDec* e) { this->def_site_ = e; }
+
 } // namespace ast

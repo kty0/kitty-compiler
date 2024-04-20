@@ -13,9 +13,12 @@ namespace escapes
 
   void EscapesVisitor::operator()(ast::FunctionDec& e)
   {
+    auto previous_function = current_function_;
+    current_function_ = &e;
     current_scope++;
     super_type::operator()(e);
     current_scope--;
+    current_function_ = previous_function;
   }
 
   void EscapesVisitor::operator()(ast::ForExp& e)
@@ -40,6 +43,8 @@ namespace escapes
   void EscapesVisitor::operator()(ast::VarDec& e)
   {
     scope_var.insert({&e, current_scope});
+    // setting the definition site
+    e.def_site_set(current_function_);
     super_type::operator()(e);
   }
 
@@ -52,11 +57,11 @@ namespace escapes
      */
     if (var_scope == current_scope && !var->is_locked())
       {
-        var->set_unescaped();
+        var->unescaped_set();
       }
     else if (var_scope != current_scope)
       {
-        var->set_escaped();
+        var->escaped_set();
       }
   }
 } // namespace escapes

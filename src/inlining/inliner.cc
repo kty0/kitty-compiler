@@ -71,8 +71,8 @@ namespace inlining
       for (size_t i = 0; i < dec->decs_get().size(); i++)
       {
           misc::symbol name = dec->decs_get()[i]->name_get();
-          misc::symbol type_name = dec->decs_get()[i]->type_name_get()->def_get()->name_get();
-          tweast << "var " << name << " : " << type_name << " = " << exp << '\n';
+          misc::symbol type_name = dec->decs_get()[i]->type_name_get()->name_get();
+          tweast << "var " << name << " : " << type_name << " := " << exp << '\n';
       }
 
       tweast << "in" << '\n';

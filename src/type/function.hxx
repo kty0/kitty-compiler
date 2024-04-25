@@ -11,6 +11,6 @@ namespace type
 {
   inline const Record& Function::formals_get() const { return *formals_; }
 
-  inline const Type& Function::result_get() const { return result_; }
+  inline const Type& Function::result_get() const { return *result_; }
 
 } // namespace type

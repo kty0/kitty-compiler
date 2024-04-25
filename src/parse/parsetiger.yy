@@ -188,7 +188,7 @@
 %precedence ":="
 %left "|"
 %left "&"
-%nonassoc ">=" "<=" "=" "<>" "<" ">"
+%left ">=" "<=" "=" "<>" "<" ">"
 %left "+" "-"
 %left "*" "/"
 %type <ast::Exp*>             exp
@@ -272,8 +272,8 @@ exp:
 
   /* Operations*/
   | "-" exp %prec UNARY { $$ = parse::parse(parse::Tweast() << "0 -" << $2); }
-  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << $3 << " <> 0 else 0"); }
-  | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << " 1 else " << $3 << " <> 0"); }
+  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then (" << $3 << ") <> 0 else 0"); }
+  | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << " 1 else (" << $3 << ") <> 0"); }
 
   /* Operations with op */
   | exp "+" exp { $$ = make_OpExp(@$, $1, ast::OpExp::Oper::add, $3); }
@@ -355,7 +355,7 @@ chunks:
   // FIXED: Some code was deleted here (More rules).
 | funchunk chunks         { $$ = $2; $$->push_front($1); }
 | varchunk chunks         { $$ = $2; $$->push_front($1); }
-| "import" STRING         { $$ = td.parse_import($2,@$); }
+| "import" STRING chunks  { $$ = $3; $$->splice_front(*td.parse_import($2,@$)); }
 | CHUNKS "(" INT ")" chunks  { $$ = metavar<ast::ChunkList>(td, $3); $$->splice_back(*$5) ; }
 ;
 /*--------------------.

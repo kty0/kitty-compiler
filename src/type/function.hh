@@ -21,7 +21,7 @@ namespace type
      **
      ** \param formals type structures of formal arguments.
      ** \param result type structure of what function returns. */
-    Function(const Record* formals, const Type& result);
+    Function(const Record* formals, const Type* result);
 
     /** \brief Destructor.
      **/
@@ -51,7 +51,7 @@ namespace type
     const Record* formals_;
 
     /// Result's type.
-    const Type& result_;
+    const Type* result_;
   };
 
 } // namespace type

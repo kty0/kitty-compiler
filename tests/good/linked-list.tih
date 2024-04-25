@@ -1,0 +1,24 @@
+type node = { value: int, next: node }
+
+function append(list: node, element: int) =
+    let
+        var new_elem := node { value = element, next = nil }
+    in
+        while list.next <> nil do
+            (
+                list := list.next
+            )
+        ;
+        list.next := new_elem
+    end
+
+function display(list: node) =
+(
+    print_int(list.value);
+    while list.next <> nil do
+        (
+            print(" -> ");
+            print_int(list.next.value);
+            list := list.next
+        )
+    )

@@ -167,7 +167,7 @@ rid              _[a-zA-Z0-9_]*
 
 {id} { return TOKEN_VAL(ID, text()); }
 
-{rid} { return TOKEN_VAL(ID, text()); }
+{rid} { if (td.enable_extensions_p_) return TOKEN_VAL(ID, text()); else ERROR("invalid id"); }
 
 
 "\""        { grown_string.clear(); start(SC_STRING); } /* start of a string */

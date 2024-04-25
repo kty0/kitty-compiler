@@ -146,20 +146,20 @@ namespace bind
 
   void Binder::operator()(ast::FunctionChunk& e)
   {
-    nb_chunks++;
     chunk_visit<ast::FunctionDec>(e);
+    nb_chunks++;
   }
 
   void Binder::operator()(ast::TypeChunk& e)
   {
-    nb_chunks++;
     chunk_visit<ast::TypeDec>(e);
+    nb_chunks++;
   }
 
   void Binder::operator()(ast::VarChunk& e)
   {
-    nb_chunks++;
     super_type::chunk_visit<ast::VarChunk>(e);
+    nb_chunks++;
   }
 
   /*
@@ -220,9 +220,9 @@ namespace bind
   void Binder::operator()(ast::ForExp& e)
   {
     this->sm.scope_begin();
-    break_stack.push(&e);
     (*this)(e.vardec_get());
     (*this)(e.hi_get());
+    break_stack.push(&e);
     (*this)(e.body_get());
     break_stack.pop();
     this->sm.scope_end();
@@ -230,8 +230,8 @@ namespace bind
 
   void Binder::operator()(ast::WhileExp& e)
   {
-    break_stack.push(&e);
     (*this)(e.test_get());
+    break_stack.push(&e);
     (*this)(e.body_get());
     break_stack.pop();
   }

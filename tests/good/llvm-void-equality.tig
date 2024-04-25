@@ -1,0 +1,4 @@
+let
+in
+  if () = print("maybe\n") then print("yes\n") else print("no\n")
+end

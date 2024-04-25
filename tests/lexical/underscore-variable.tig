@@ -1,0 +1,5 @@
+let
+  var y := 6
+  var _ := 5
+in
+end

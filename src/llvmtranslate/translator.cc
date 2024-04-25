@@ -109,7 +109,7 @@ namespace llvmtranslate
         auto array = translate(arr_ast->var_get());
         auto index = translate(arr_ast->index_get());
         return builder_.CreateGEP(sub_type, array, index,
-                                  "subscriptptr_"s + array->getName().str());
+                                  "subscriptptr");
       }
     else if (auto field_ast = dynamic_cast<const ast::FieldVar*>(&e))
       {
@@ -121,7 +121,7 @@ namespace llvmtranslate
         const type::Record* record_type = nullptr;
         // FIXED: Some code was deleted here.
 
-        record_type = dynamic_cast<const type::Record*>(var->type_get());
+        record_type = dynamic_cast<const type::Record*>(&var->type_get()->actual());
 
         misc::symbol field_name;
         // FIXED: Some code was deleted here.
@@ -142,7 +142,8 @@ namespace llvmtranslate
         // usually used with records or arrays.
         llvm::Type* record_ltype = nullptr;
         // FIXED: Some code was deleted here (Get record's corresponding LLVM type).
-        record_ltype = llvm_type(*field_ast->type_get());
+        llvm_type(*record_type);
+        record_ltype = type_visitor_.get_record_ltype(record_type);
 
         return builder_.CreateStructGEP(record_ltype, var_val, index,
                                         "fieldptr_"s + field_name.get());
@@ -258,22 +259,33 @@ namespace llvmtranslate
   void Translator::operator()(const ast::FieldVar& e)
   {
     // FIXED: Some code was deleted here.
-    value_ = access_var(e);
+    value_ = builder_.CreateLoad(llvm_type(*e.type_get()), access_var(e),
+        e.name_get().get());
   }
 
   void Translator::operator()(const ast::SubscriptVar& e)
   {
     // FIXED: Some code was deleted here.
-    value_ = access_var(e);
+    value_ = builder_.CreateLoad(llvm_type(*e.type_get()), access_var(e), "subscriptvar");
   }
 
   void Translator::operator()(const ast::NilExp& e)
   {
     // FIXED: Some code was deleted here (Get the record_type of the Nil type, and create a null pointer).
-    auto record_type = dynamic_cast<const type::Record*>(e.type_get());
-    llvm::Type* rec_type = llvm_type(*record_type);
+    const type::Nil *nil_type = dynamic_cast<const type::Nil*>(e.type_get());
+    if (nil_type == nullptr)
+      {
+        std::cerr << "invalid NilExp in translator";
+        return;
+      }
+
+    const type::Record *record_type = dynamic_cast<const type::Record*>(&nil_type->record_type_get()->actual());
+
+    llvm_type(*record_type);
+    auto struct_ltype = type_visitor_.get_record_ltype(record_type);
+
     value_ =
-      llvm::ConstantPointerNull::get(llvm::PointerType::get(rec_type, 0));
+      llvm::ConstantPointerNull::get(llvm::PointerType::get(struct_ltype, 0));
   }
 
   void Translator::operator()(const ast::IntExp& e)
@@ -319,11 +331,9 @@ namespace llvmtranslate
     // FIXED: Some code was deleted here.
     for (int i = 0; i < e.fields_get().size(); i++)
       {
-        llvm::Type* type = llvm_type(*e.fields_get()[i]->init_get().type_get());
-        llvm::Value* val = builder_.CreateStructGEP(type, malloc_val, i);
-        llvm::StoreInst* store = builder_.CreateStore(val, malloc_val);
+        llvm::Value* val = builder_.CreateStructGEP(struct_ltype, malloc_val, i, "fieldinit_"s + e.fields_get()[i]->name_get().get());
+        llvm::StoreInst* store = builder_.CreateStore(translate(*e.fields_get()[i]), val);
       }
-    value_ = malloc_val;
   }
 
   void Translator::operator()(const ast::OpExp& e)
@@ -393,22 +403,22 @@ namespace llvmtranslate
     // FIXED: Some code was deleted here.
     auto value = translate(e.exp_get());
     auto var = access_var(e.var_get());
-    value_ = builder_.CreateStore(value, var);
+    builder_.CreateStore(value, var);
   }
 
   void Translator::operator()(const ast::IfExp& e)
   {
     // FIXED: Some code was deleted here (IfExps are handled in a similar way to Kaleidoscope (see LangImpl5.html)).
 
-    llvm::Value* condv = builder_.CreateFCmpONE(
-      translate(e.test_get()), llvm::ConstantFP::get(ctx_, llvm::APFloat(0.0)),
+    llvm::Value* condv = builder_.CreateICmpNE(
+      translate(e.test_get()), builder_.getInt32(0),
       "ifcond");
 
     llvm::Function* TheFunction = builder_.GetInsertBlock()->getParent();
     llvm::BasicBlock* ThenBB =
       llvm::BasicBlock::Create(ctx_, "then", TheFunction);
     llvm::BasicBlock* ElseBB = llvm::BasicBlock::Create(ctx_, "else");
-    llvm::BasicBlock* MergeBB = llvm::BasicBlock::Create(ctx_, "ifcont");
+    llvm::BasicBlock* MergeBB = llvm::BasicBlock::Create(ctx_, "ifend");
 
     builder_.CreateCondBr(condv, ThenBB, ElseBB);
 
@@ -430,7 +440,7 @@ namespace llvmtranslate
     TheFunction->getBasicBlockList().push_back(MergeBB);
     builder_.SetInsertPoint(MergeBB);
     llvm::PHINode* PN =
-      builder_.CreatePHI(llvm::Type::getDoubleTy(ctx_), 2, "iftmp");
+      builder_.CreatePHI(llvm_type(*e.thenclause_get().type_get()), 2, "iftmp");
 
     PN->addIncoming(ThenV, ThenBB);
     PN->addIncoming(ElseV, ElseBB);
@@ -476,8 +486,9 @@ namespace llvmtranslate
   {
     // FIXED: Some code was deleted here.
     auto block = e.def_get();
-    value_ = builder_.CreateBr(
+    builder_.CreateBr(
       loop_end_[dynamic_cast<const ast::WhileExp*>(e.def_get())]);
+    value_ = llvm::ConstantInt::get(i32_t(ctx_), 0);
   }
 
   void Translator::operator()(const ast::ArrayExp& e)
@@ -619,10 +630,9 @@ namespace llvmtranslate
     auto func = module_.getFunction(name);
     std::vector<llvm::Value*> arguments;
 
-    const type::Type* node_type = nullptr;
-    node_type = e.type_get();
-    auto& function_type = static_cast<const type::Function&>(*node_type);
-    auto& escaped = escaped_[&function_type];
+    const type::Type* node_type = e.def_get()->type_get();
+    const type::Function *function_type = dynamic_cast<const type::Function *>(node_type);
+    auto& escaped = escaped_[function_type];
 
     for (const auto var : escaped)
       {
@@ -636,12 +646,14 @@ namespace llvmtranslate
 
     if (*e.type_get() == type::Void::instance())
     {
-      value_ = builder_.CreateCall(func, arguments);
+      builder_.CreateCall(func, arguments);
+      value_ = llvm::ConstantInt::get(i32_t(ctx_), 0);
     }
     else
     {
       value_ = builder_.CreateCall(func, arguments, "call_" + name);
     }
+
   }
 
   void Translator::operator()(const ast::VarDec& e)

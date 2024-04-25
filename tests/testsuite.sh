@@ -34,12 +34,20 @@ for file in $(find "syntax" -name "*.tig"); do
   check "$file" 3 "-A"
 done
 
+for file in $(find "lexical" -name "*.tig"); do
+  check "$file" 2 "-A"
+done
+
 for file in $(find "bind" -name "*.tig"); do
   check "$file" 4 "-bBA"
 done
 
 for file in $(find "type" -name "*.tig"); do
   check "$file" 5 "-T"
+done
+
+for file in $(find "good" -name "*.tig"); do
+  check "$file" 0 "--llvm-display"
 done
 
 echo "» Total: $counter\n» Passed: $passed ($(($passed * 100 / $counter))%)"

@@ -13,7 +13,7 @@ namespace type
   Method::Method(misc::symbol name,
                  const Class* owner,
                  const Record* formals,
-                 const Type& result,
+                 const Type* result,
                  ast::MethodDec* def)
     : Function(formals, result)
     , name_(name)

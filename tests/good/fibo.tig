@@ -1,0 +1,24 @@
+let
+  import "fibo.tih"
+  function test_fibo(n : int, expected: int) =
+    (
+      print("Testing fibo(");
+      print_int(n);
+      print(")...\nExpected : ");
+      print_int(expected);
+      print("\ngot      : ");
+      print_int(fibo(n));
+      print("\n\n")
+    )
+in
+  test_fibo(-1, -1);
+  test_fibo(0, 0);
+  test_fibo(1, 1);
+  test_fibo(2, 1);
+  test_fibo(5, 5);
+  test_fibo(10, 55);
+
+  /* You may fail these if you use recursion. Go iterative. */
+  test_fibo(42, 267914296);
+  test_fibo(45, 1134903170)
+end

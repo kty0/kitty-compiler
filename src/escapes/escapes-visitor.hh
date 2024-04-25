@@ -68,6 +68,7 @@ namespace escapes
     std::map<ast::VarDec*, int> scope_var;
     // to store the current function during visiting
     ast::FunctionDec* current_function_ = nullptr;
+    bool check_used_variable = false;
   };
 
 } // namespace escapes

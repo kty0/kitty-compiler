@@ -17,6 +17,9 @@ namespace escapes
     current_function_ = &e;
     current_scope++;
     super_type::operator()(e);
+    check_used_variable = true;
+    super_type ::operator()(e); // check is there is a vardec not used
+    check_used_variable = false;
     current_scope--;
     current_function_ = previous_function;
   }
@@ -42,10 +45,18 @@ namespace escapes
 
   void EscapesVisitor::operator()(ast::VarDec& e)
   {
-    scope_var.insert({&e, current_scope});
-    // setting the definition site
-    e.def_site_set(current_function_);
-    super_type::operator()(e);
+    if (!check_used_variable)
+      {
+        scope_var.insert({&e, current_scope});
+        // setting the definition site
+        e.def_site_set(current_function_);
+        super_type::operator()(e);
+      }
+    else
+      {
+        if(!e.is_locked())
+          e.unescaped_set();
+      }
   }
 
   void EscapesVisitor::operator()(ast::SimpleVar& e)

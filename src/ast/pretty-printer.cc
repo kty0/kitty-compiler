@@ -268,37 +268,39 @@ namespace ast
         if (bindings_display(ostr_))
           {
             if (escapes_display(ostr_) && (*formals.begin())->is_escaped())
-            {
-              ostr_ << "/* escaping */ ";
-            }
+              {
+                ostr_ << "/* escaping */ ";
+              }
             ostr_ << (*formals.begin())->name_get() << " /* "
-                  << (*formals.begin()) << " */"
-                  << " : " << *(*formals.begin())->type_name_get();
+                  << (*formals.begin()) << " */" << " : "
+                  << *(*formals.begin())->type_name_get();
             for (auto it = formals.begin() + 1; it != formals.end(); it++)
               {
+                ostr_ << ", ";
                 if (escapes_display(ostr_) && (*it)->is_escaped())
-                {
-                  ostr_ << "/* escaping */ ";
-                }
-                ostr_ << ", " << (*it)->name_get() << " /* " << (*it) << " */"
+                  {
+                    ostr_ << "/* escaping */ ";
+                  }
+                ostr_ << (*it)->name_get() << " /* " << (*it) << " */"
                       << " : " << *(*it)->type_name_get();
               }
           }
         else
           {
             if (escapes_display(ostr_) && (*formals.begin())->is_escaped())
-            {
-              ostr_ << "/* escaping */ ";
-            }
+              {
+                ostr_ << "/* escaping */ ";
+              }
             ostr_ << (*formals.begin())->name_get() << " : "
                   << *(*formals.begin())->type_name_get();
             for (auto it = formals.begin() + 1; it != formals.end(); it++)
               {
+                ostr_ << ", ";
                 if (escapes_display(ostr_) && (*it)->is_escaped())
-                {
-                  ostr_ << "/* escaping */ ";
-                }
-                ostr_ << ", " << (*it)->name_get() << " : "
+                  {
+                    ostr_ << "/* escaping */ ";
+                  }
+                ostr_ << (*it)->name_get() << " : "
                       << *(*it)->type_name_get();
               }
           }

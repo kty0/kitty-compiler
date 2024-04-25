@@ -63,27 +63,39 @@ namespace inlining
 
   void Inliner::operator()(const ast::CallExp& e)
   {
-      parse::Tweast tweast;
-
-      tweast << "let" << '\n';
-
-      VarChunk* dec = recurse(e.def_get()->formals_get());
-      for (size_t i = 0; i < dec->decs_get().size(); i++)
+      if (rec_funs_get().contains(e.def_get()))
       {
-          misc::symbol name = dec->decs_get()[i]->name_get();
-          misc::symbol type_name = dec->decs_get()[i]->type_name_get()->name_get();
-          tweast << "var " << name << " : " << type_name << " := " << exp << '\n';
+          super_type::operator()(e);
       }
+      else {
 
-      tweast << "in" << '\n';
+          parse::Tweast tweast;
 
-      Exp* body = recurse(e.def_get()->body_get());
+          tweast << "let" << '\n';
 
-      tweast << body << '\n'
-            << "end\n";
+          VarChunk *dec = recurse(e.def_get()->formals_get());
+          for (size_t i = 0; i < dec->decs_get().size(); i++) {
+              misc::symbol name = dec->decs_get()[i]->name_get();
+              misc::symbol type_name = dec->decs_get()[i]->type_name_get()->name_get();
+              tweast << "var " << name << " : " << type_name << " := " << exp << '\n';
+          }
 
-      ast::Exp *res = parse::parse(tweast);
-      result_ = res;
+          if (e.def_get()->result_get() != nullptr) {
+              Exp *body = recurse(e.def_get()->body_get());
+              misc::symbol result_type = e.def_get()->result_get()->name_get();
+              tweast << "var res : " << result_type << " := (" << body << ")\n"
+                      << "in" << '\n'
+                      << "res" << '\n'
+                      << "end\n";
+          }
+          else {
+
+              tweast << "in" << '\n'
+                     << "end\n";
+          }
+          ast::Exp *res = parse::parse(tweast);
+          result_ = res;
+      }
   }
 
 } // namespace inlining

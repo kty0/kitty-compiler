@@ -4,6 +4,8 @@
  */
 
 #include <inlining/pruner.hh>
+#include <parse/tweast.hh>
+#include <parse/libparse.hh>
 
 namespace inlining
 {
@@ -30,5 +32,29 @@ namespace inlining
   }
 
   // FIXME: Some code was deleted here.
+/*
+  void Pruner::operator()(const ast::FunctionDec& e)
+  {
+      if (called_functions_.find() == called_functions_.end())
+      {
+
+      }
+      current_functions_.push_back(e);
+  }
+
+  void Pruner::operator()(const ast::CallExp& e)
+  {
+      if (called_functions_)
+  }
+
+  void Pruner::operator()(const ast::FunctionChunk& e)
+  {
+      parse::Tweast tweast;
+      tweast << *prune(const_cast<ast::FunctionChunk&>(e));
+      std::cout << *prune(const_cast<ast::FunctionChunk&>(e));
+      ast::Exp *res = parse::parse(tweast);
+      result_ = res;
+  }
+  */
 
 } // namespace inlining

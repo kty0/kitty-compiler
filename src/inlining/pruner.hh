@@ -27,6 +27,7 @@ namespace inlining
     /// \name Visit methods.
     /// \{
     // FIXME: Some code was deleted here.
+    //void operator()(const ast::FunctionChunk&) override;
     /// \}
 
     ast::FunctionChunk* prune(ast::FunctionChunk& e);

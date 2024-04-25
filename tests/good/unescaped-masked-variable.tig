@@ -1,0 +1,9 @@
+let
+  var a := 5
+in
+  let
+    var a := 5
+  in
+    a
+  end
+end

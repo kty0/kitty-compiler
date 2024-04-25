@@ -38,7 +38,7 @@ namespace llvmtranslate
   void LLVMTypeVisitor::operator()(const type::Void&)
   {
     // FIXED: Some code was deleted here (Void types can be interpreted as int or void type).
-    type_ = llvm::Type::getVoidTy(ctx_);
+    type_ = llvm::Type::getInt32Ty(ctx_);
   }
 
   void LLVMTypeVisitor::operator()(const type::Int&)
@@ -57,8 +57,7 @@ namespace llvmtranslate
   void LLVMTypeVisitor::operator()(const type::Named& e)
   {
     // FIXED: Some code was deleted here.
-    auto type = e.type_get();
-    type_ = llvm_type(*type);
+    type_ = llvm_type(e.actual());
   }
 
   void LLVMTypeVisitor::operator()(const type::Record& e)

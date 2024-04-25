@@ -1,0 +1,5 @@
+let
+  function add(x: int, y: int) : int = x + y
+in
+  print_int(add(1,(add(2, 3)))); print("\n")
+end

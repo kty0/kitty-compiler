@@ -28,8 +28,17 @@ namespace desugar
     if (!desugar_string_cmp_p_)
       {
           super_type::operator()(e);
+          return;
       }
-    else if (e.oper_get() == ast::OpExp::Oper::eq)
+
+    if (*e.left_get().type_get() != type::String::instance()
+        || *e.right_get().type_get() != type::String::instance())
+      {
+        super_type::operator()(e);
+        return;
+      }
+
+    if (e.oper_get() == ast::OpExp::Oper::eq)
       {
         const auto& left = recurse(e.left_get());
         const auto& right = recurse(e.right_get());

@@ -1,0 +1,1 @@
+let var string := "My printed variable" in print(string); print("\n") end

@@ -11,7 +11,7 @@
 
 namespace type
 {
-  Function::Function(const Record* formals, const Type& result)
+  Function::Function(const Record* formals, const Type* result)
     : result_(result)
   {
     precondition(formals);
@@ -28,7 +28,7 @@ namespace type
   // FIXED: Some code was deleted here.
   bool Function::compatible_with(const Type& other) const
   {
-    if (result_.compatible_with(other.actual()))
+    if (result_->compatible_with(other.actual()))
       {
         return true;
       }

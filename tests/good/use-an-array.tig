@@ -1,0 +1,44 @@
+let
+  import "use-an-array.tih"
+  var array_1 := int_array[5] of 0
+  var array_2 := int_array[4] of 0
+  var array_3 := int_array[4] of 0
+
+in
+  array_1[0] :=  14;
+  array_1[1] :=  16;
+  array_1[2] :=  18;
+  array_1[3] :=  12;
+  array_1[4] :=  18;
+
+  array_2[0] :=  21;
+  array_2[1] :=  22;
+  array_2[2] :=  23;
+  array_2[3] :=  24;
+
+  array_3[0] :=  39;
+  array_3[1] :=  38;
+  array_3[2] :=  37;
+  array_3[3] :=  36;
+
+  let
+    function test_max_search(arr: int_array, size: int, expected: int) =
+      (
+        print("Looking for maximum's index in array\n[ ");
+        for i := 0 to size - 1 do
+          (
+            print_int(arr[i]);
+            print(" ")
+          );
+        print("]\nExpected : ");
+        print_int(expected);
+        print("\ngot      : ");
+        print_int(max_search(arr, size));
+        print("\n\n")
+      )
+    in
+      test_max_search(array_1, 5, 2);
+      test_max_search(array_2, 4, 3);
+      test_max_search(array_3, 4, 0)
+    end
+end

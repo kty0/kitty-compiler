@@ -1,0 +1,26 @@
+type int_array = array of int
+
+function sort(arr: int_array, size: int) =
+    if size > 0 then
+        let
+            var swapped := 0
+            var tmp := 0
+            var i := 0
+        in
+            while i < size - 1 do
+                (
+                    for j := 0 to size - i - 2 do
+                        if arr[j] > arr[j + 1] then
+                            (
+                                swapped := 1;
+                                tmp := arr[j];
+                                arr[j] := arr[j + 1];
+                                arr[j + 1] := tmp
+                            )
+                    ;
+                    if swapped = 0 then
+                        i := size
+                    ;
+                    i := i + 1
+                )
+        end

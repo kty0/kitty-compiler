@@ -1,0 +1,58 @@
+let
+  import "sort.tih"
+  var array_1 := int_array[5] of 0
+  var array_2 := int_array[4] of 0
+  var array_3 := int_array[4] of 0
+
+  var array_1_sorted := int_array[5] of 0
+  var array_2_sorted := int_array[4] of 0
+  var array_3_sorted := int_array[4] of 0
+
+in
+  array_1[0] := -14;    array_1_sorted[0] := -18;
+  array_1[1] :=  16;    array_1_sorted[1] := -14;
+  array_1[2] := -10;    array_1_sorted[2] := -10;
+  array_1[3] :=  12;    array_1_sorted[3] :=  12;
+  array_1[4] := -18;    array_1_sorted[4] :=  16;
+
+  array_2[0] :=  21;    array_2_sorted[0] :=  21;
+  array_2[1] :=  22;    array_2_sorted[1] :=  22;
+  array_2[2] :=  23;    array_2_sorted[2] :=  23;
+  array_2[3] :=  24;    array_2_sorted[3] :=  24;
+
+  array_3[0] :=  39;    array_3_sorted[0] :=  36;
+  array_3[1] :=  38;    array_3_sorted[1] :=  37;
+  array_3[2] :=  37;    array_3_sorted[2] :=  38;
+  array_3[3] :=  36;    array_3_sorted[3] :=  39;
+
+  let
+    function test_sort(arr: int_array, size: int, expected: int_array) =
+      let
+        function print_array(arr: int_array) =
+          (
+            print("[ ");
+            for i := 0 to size - 1 do
+              (
+                print_int(arr[i]);
+                print(" ")
+              );
+            print("]")
+          )
+      in
+        print("Sorting array ");
+        print_array(arr);
+
+        sort(arr, size);
+
+        print("\nExpected : ");
+        print_array(expected);
+        print("\ngot      : ");
+        print_array(arr);
+        print("\n\n")
+      end
+  in
+    test_sort(array_1, 5, array_1_sorted);
+    test_sort(array_2, 4, array_2_sorted);
+    test_sort(array_3, 4, array_3_sorted)
+  end
+end

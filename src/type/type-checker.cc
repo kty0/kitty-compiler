@@ -209,13 +209,19 @@ namespace type
       }
 
     auto fields = e.fields_get();
+
+    if (fields.size() != record_type->fields_get().size())
+      {
+        error(e, "invalid RecordExp");
+      }
+
     for (size_t i = 0; i < fields.size(); i++)
       {
         check_types(e, "field", *type(fields[i]->init_get()), "expected",
                     record_type->fields_get()[i].type_get());
       }
 
-    type_default(e, e.type_name_get().type_get());
+    type_default(e, &e.type_name_get().type_get()->actual());
   }
 
   void TypeChecker::operator()(ast::OpExp& e)
@@ -403,7 +409,7 @@ namespace type
     // FIXED: Some code was deleted here.
     const Type* result =
       e.result_get() == nullptr ? &Void::instance() : type(*e.result_get());
-    Function* function = new Function(type(e.formals_get()), *result);
+    Function* function = new Function(type(e.formals_get()), result);
     type_default(e, function);
     created_type_default(e, function);
   }
@@ -512,6 +518,7 @@ namespace type
         if (named_type != nullptr && !named_type->sound())
         {
           error(e, "recursive inheritance");
+          named_type->type_set(&Int::instance());
           return;
         }
       }

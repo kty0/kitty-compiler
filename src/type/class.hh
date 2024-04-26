@@ -53,6 +53,8 @@ namespace type
     using attrs_type = std::vector<Attribute>;
     /// List of Method's.
     using meths_type = std::vector<const Method*>;
+    /// List of Subclasses's.
+    using subclasses_type = std::vector<const Class*>;
 
     /// Return the list of stored Attributes (read only).
     const attrs_type& attrs_get() const;
@@ -96,12 +98,28 @@ namespace type
 
     /** \name Accessors.
      ** \{ */
+    /// Return the unique identifier of the class.
+    unsigned id_get() const;
 
     /// Return the type of the super class.
     const Class* super_get() const;
     /// Set the type of the super class.
     void super_set(const Class* type);
 
+    /// Return (the transitive closure of) the list of subclasses.
+    const subclasses_type& subclasses_get() const;
+
+    /// \brief Add a class to the list of subclasses.
+    ///
+    /// Although this method alters \a this, it is const, since types
+    /// are mostly manipulated as const entities.
+    void subclass_add(const Class* subclass) const;
+
+    /// \brief Erase all the subclasses.
+    ///
+    /// This method is const for the same reason as
+    /// type::Class::subclass_add.
+    void subclasses_clear() const;
     /** \} */
 
     /** \name Type resolution.
@@ -120,8 +138,15 @@ namespace type
     static const Class& object_instance();
 
   private:
+    /// Return a fresh identifier.
+    static unsigned fresh_id();
+
+    /// Class unique identifier
+    unsigned id_;
     /// Super class.
     const Class* super_;
+    /// Sub classes.
+    mutable subclasses_type subclasses_;
     /// Attributes list.
     attrs_type attrs_;
     /// Methods list.

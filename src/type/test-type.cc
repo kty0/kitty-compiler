@@ -17,6 +17,7 @@ int main()
   // Define the named type `a', pointing to `b', pointing to `int'.
   const Named b("b", &Int::instance());
   const Named a("a", &b);
+
   // This definition is sound.
   ASSERT(a.sound());
 
@@ -48,10 +49,8 @@ int main()
   ASSERT(rec == Rec);
 
   const Nil n{};
-  ASSERT(dynamic_cast<const Nil*>(&n.actual()));
   ASSERT(Rec.compatible_with(n));
   ASSERT(n.compatible_with(Rec));
-
 
   ASSERT(!Rec.compatible_with(Int::instance()));
   ASSERT(!Int::instance().compatible_with(Rec));

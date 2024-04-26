@@ -51,7 +51,6 @@ namespace llvmtranslate
     // Strings are pointers to characters in LLVM.
     // FIXED: Some code was deleted here.
     type_ = llvm::Type::getInt8PtrTy(ctx_);
-
   }
 
   void LLVMTypeVisitor::operator()(const type::Named& e)

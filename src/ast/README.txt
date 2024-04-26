@@ -50,7 +50,7 @@ Incomplete classes are tagged with a `*'.
   /Ty/              ()
     ArrayTy         (NameTy base_type)
     ClassTy         (NameTy super, ChunkList chunks)
-    NameTy          (symbol name) 
+    NameTy          (symbol name)
     RecordTy        (fields_type fields)
 
   ChunkList         (list_type chunks)

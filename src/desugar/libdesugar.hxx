@@ -10,9 +10,11 @@
 #include <ast/chunk-list.hh>
 #include <ast/exp.hh>
 #include <bind/libbind.hh>
+#include <desugar/bounds-checking-visitor.hh>
 #include <desugar/desugar-visitor.hh>
 #include <desugar/libdesugar.hh>
 #include <escapes/libescapes.hh>
+#include <overload/liboverload.hh>
 #include <type/libtype.hh>
 
 namespace desugar
@@ -62,5 +64,32 @@ namespace desugar
   /// Explicit instantiations.
   template ast::ChunkList* raw_desugar(const ast::ChunkList&, bool, bool);
   template ast::ChunkList* desugar(const ast::ChunkList&, bool, bool);
+
+  /*-----------------------.
+  | Array bounds checking.  |
+  `-----------------------*/
+
+  template <typename A> A* raw_bounds_checks_add(const A& tree)
+  {
+    // Add array bounds checking code.
+    BoundsCheckingVisitor add_bounds_checks;
+    add_bounds_checks(tree);
+    return dynamic_cast<A*>(add_bounds_checks.result_get());
+  }
+
+  template <typename A> A* bounds_checks_add(const A& tree)
+  {
+    // Add bounds checks.
+    A* transformed = raw_bounds_checks_add(tree);
+    assertion(transformed);
+    std::unique_ptr<A> transformed_ptr(transformed);
+    // Recompute the bindings and the types.
+    bind_and_types_check(*transformed_ptr);
+    return transformed_ptr.release();
+  }
+
+  /// Explicit instantiations.
+  template ast::ChunkList* raw_bounds_checks_add(const ast::ChunkList&);
+  template ast::ChunkList* bounds_checks_add(const ast::ChunkList&);
 
 } // namespace desugar

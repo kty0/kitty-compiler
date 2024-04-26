@@ -53,4 +53,22 @@ namespace desugar::tasks
                raw_desugar,
                "typed rename");
 
+  /*-----------------------.
+    | Array bounds checking.  |
+    `-----------------------*/
+
+  /// Enable emission of dynamic array bounds checking code.
+  TASK_DECLARE("bounds-checks-add",
+               "add dynamic bounds checks",
+               bounds_checks_add,
+               "types-compute rename");
+
+  /// Enable emission of dynamic array bounds checking code without
+  /// recomputing bindings nor types.
+  TASK_DECLARE("raw-bounds-checks-add",
+               "add bounds-checking to the AST without recomputing "
+               "bindings nor types",
+               raw_bounds_checks_add,
+               "typed rename");
+
 } // namespace desugar::tasks

@@ -39,6 +39,7 @@ try_import(
         "combine",
         "astclone",
         "desugar",
+        "overload",
         "llvmtranslate",
     ],
 )

@@ -67,8 +67,22 @@ namespace type
 
   inline bool Class::has_data() const { return !attrs_.empty(); }
 
+  inline unsigned Class::id_get() const { return id_; }
+
   inline const Class* Class::super_get() const { return super_; }
 
   inline void Class::super_set(const Class* super) { super_ = super; }
+
+  inline const Class::subclasses_type& Class::subclasses_get() const
+  {
+    return subclasses_;
+  }
+
+  inline void Class::subclass_add(const Class* subclass) const
+  {
+    subclasses_.emplace_back(subclass);
+  }
+
+  inline void Class::subclasses_clear() const { subclasses_.clear(); }
 
 } // namespace type

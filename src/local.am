@@ -63,7 +63,11 @@ include src/parse/local.am
 include src/astclone/local.am
 include src/bind/local.am
 include src/escapes/local.am
+include src/callgraph/local.am
 include src/type/local.am
 include src/object/local.am
+include src/overload/local.am
 include src/desugar/local.am
+include src/inlining/local.am
 include src/llvmtranslate/local.am
+include src/combine/local.am

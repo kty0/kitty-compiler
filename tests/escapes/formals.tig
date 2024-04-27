@@ -1,0 +1,14 @@
+let 
+    function a(x : int, x2 : string, x3 : int) =
+    let 
+        function b() = 
+        (    
+            x + 1;
+            print(x2);
+            print_int(x3)
+        )
+    in 
+        b()
+    end
+in 
+end

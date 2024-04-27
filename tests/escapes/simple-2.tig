@@ -1,0 +1,7 @@
+let 
+    var a := 42
+    var b := 43
+    function incr(x: int) : int = x + a
+in 
+    incr(b)
+end

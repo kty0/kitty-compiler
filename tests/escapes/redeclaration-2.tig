@@ -1,0 +1,9 @@
+let 
+    var baba := 2
+    function x() : int = 
+        let 
+            var baba := baba 
+        in 
+        end
+in
+end

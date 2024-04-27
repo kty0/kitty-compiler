@@ -56,16 +56,12 @@ namespace escapes
     // FIXED: Some code was deleted here.
     // add scope_level
     void operator()(ast::FunctionDec& e) override;
-    void operator()(ast::LetExp& e) override;
-    void operator()(ast::ForExp& e) override;
     // add the variable declaration in the map
     void operator()(ast::VarDec& e) override;
     // checking if the variable is escaped
     void operator()(ast::SimpleVar& e) override;
 
   private:
-    // @ of the variable declaration and his scope-level
-    std::map<ast::VarDec*, int> scope_var;
     // to store the current function during visiting
     ast::FunctionDec* current_function_ = nullptr;
     bool check_used_variable = false;

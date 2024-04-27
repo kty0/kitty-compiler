@@ -1,0 +1,7 @@
+let 
+    var a := 5
+    function b() =
+    for a := 0 to a do 
+        ()
+in 
+end

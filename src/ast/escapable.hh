@@ -17,7 +17,6 @@ namespace ast
   public:
     void escaped_set();
     void unescaped_set();
-    bool is_locked() const;
     bool is_escaped() const;
     ast::FunctionDec* def_site_get() const;
     void def_site_set(ast::FunctionDec* e);
@@ -25,7 +24,6 @@ namespace ast
   private:
     // FIXED: Some code was deleted here.
     bool escaped_ = true; // by default, variables are escaped
-    bool locked_ = false;
     ast::FunctionDec* def_site_ = nullptr;
   };
 } // namespace ast

@@ -1,0 +1,7 @@
+let
+    var a := 3
+    function b() : int = a + 3 
+    var a := 4
+in 
+    b()
+end 

@@ -59,6 +59,45 @@ namespace inlining
     return rec_funs_;
   }
 
-  // FIXME: Some code was deleted here.
+  // FIXED: Some code was deleted here.
+
+  void Inliner::operator()(const ast::CallExp& e)
+  {
+    if (rec_funs_get().contains(e.def_get()) || !e.def_get()->body_get())
+      {
+        super_type::operator()(e);
+      }
+    else
+      {
+        parse::Tweast tweast;
+
+        tweast << "let" << '\n';
+
+        VarChunk* dec = recurse(e.def_get()->formals_get());
+        for (size_t i = 0; i < dec->decs_get().size(); i++)
+          {
+            Exp* exp = recurse(*e.args_get()[i]);
+            misc::symbol name = dec->decs_get()[i]->name_get();
+            misc::symbol type_name =
+              dec->decs_get()[i]->type_name_get()->name_get();
+            tweast << "var " << name << " : " << type_name << " := " << exp
+                   << '\n';
+          }
+
+        Exp* body = recurse(e.def_get()->body_get());
+        tweast << "var res";
+        if (e.def_get()->result_get() != nullptr)
+          {
+            misc::symbol result_type = e.def_get()->result_get()->name_get();
+            tweast << " : " << result_type;
+          }
+        tweast << " := (" << body << ")\n"
+               << "in" << '\n'
+               << "res" << '\n'
+               << "end\n";
+        ast::Exp* res = parse::parse(tweast);
+        result_ = res;
+      }
+  }
 
 } // namespace inlining

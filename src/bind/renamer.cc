@@ -75,10 +75,7 @@ namespace bind
       }
   }
 
-  void Renamer::operator()(ast::TypeChunk& e)
-  {
-    chunk_visit<ast::TypeDec>(e);
-  }
+  void Renamer::operator()(ast::TypeChunk& e) { chunk_visit<ast::TypeDec>(e); }
 
   void Renamer::operator()(ast::TypeDec&)
   {
@@ -86,8 +83,7 @@ namespace bind
     unreachable();
   }
 
-  template <>
-  void Renamer::visit_dec_header<ast::TypeDec>(ast::TypeDec& e)
+  template <> void Renamer::visit_dec_header<ast::TypeDec>(ast::TypeDec& e)
   {
     // Make the new name
     std::string name = e.name_get().get() + "_" + std::to_string(count);
@@ -98,8 +94,7 @@ namespace bind
     e.name_set(sym);
   }
 
-  template <>
-  void Renamer::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
+  template <> void Renamer::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
   {
     (*this)(e.ty_get());
   }

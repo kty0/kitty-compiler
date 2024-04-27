@@ -2,6 +2,8 @@
 let
  type rec = { id : int }
 in
-  rec { id = 0 } = nil;
-  rec { id = 0 } <> nil
+  print_int(rec { id = 0 } = nil);
+  print("\n");
+  print_int(rec { id = 0 } <> nil);
+  print("\n")
 end

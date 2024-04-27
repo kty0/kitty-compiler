@@ -188,7 +188,7 @@
 %precedence ":="
 %left "|"
 %left "&"
-%left ">=" "<=" "=" "<>" "<" ">"
+%nonassoc ">=" "<=" "=" "<>" "<" ">"
 %left "+" "-"
 %left "*" "/"
 %type <ast::Exp*>             exp
@@ -272,7 +272,7 @@ exp:
 
   /* Operations*/
   | "-" exp %prec UNARY { $$ = parse::parse(parse::Tweast() << "0 -" << $2); }
-  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then (" << $3 << ") <> 0 else 0"); }
+  | exp "&" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then ( " << $3 << " ) <> 0 else 0"); }
   | exp "|" exp   { $$ = parse::parse(parse::Tweast() << "if " << $1 << " then " << " 1 else (" << $3 << ") <> 0"); }
 
   /* Operations with op */

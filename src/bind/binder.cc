@@ -110,7 +110,7 @@ namespace bind
 
   template <> void Binder::visit_dec_body<ast::FunctionDec>(ast::FunctionDec& e)
   {
-    this->sm.scope_begin(); // open the scope
+    this->sm.scope_begin();   // open the scope
     (*this)(e.formals_get()); // visit
 
     if (e.result_get() != nullptr)
@@ -175,13 +175,13 @@ namespace bind
 
   void Binder::operator()(ast::VarDec& e)
   {
+    if (e.init_get() != nullptr)
+      {
+        (*this)(e.init_get());
+      }
     try
       {
         binding_tuples t = this->sm.get(e.name_get());
-        if (e.init_get() != nullptr)
-          {
-            (*this)(e.init_get());
-          }
         if (GETVAR != nullptr && GET_LAST_CHUNK_VAR == nb_chunks)
           {
             this->error_ << misc::error::error_type::bind << e.location_get()
@@ -208,7 +208,6 @@ namespace bind
       {
         (*this)(e.type_name_get());
       }
-
   }
 
   /*

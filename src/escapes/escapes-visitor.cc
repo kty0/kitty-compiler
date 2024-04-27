@@ -29,7 +29,7 @@ namespace escapes
   void EscapesVisitor::operator()(ast::SimpleVar& e)
   {
     ast::VarDec* var = e.def_get();
-    if(var->def_site_get() != current_function_)
+    if (var->def_site_get() != current_function_)
       {
         var->escaped_set();
       }

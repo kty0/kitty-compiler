@@ -96,7 +96,8 @@ namespace type
 
     std::vector<Field> fields = e.fields_get();
 
-    ostr_ << (*fields.begin()).name_get() << " : " << (*fields.begin()).type_get();
+    ostr_ << (*fields.begin()).name_get() << " : "
+          << (*fields.begin()).type_get();
     for (auto it = fields.begin() + 1; it != fields.end(); it++)
       {
         ostr_ << ", " << it->name_get() << " : " << it->type_get();

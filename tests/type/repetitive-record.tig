@@ -1,0 +1,4 @@
+let
+  type wrong = { a : int, a : string }
+in
+end

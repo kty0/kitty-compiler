@@ -3,12 +3,12 @@
  ** \brief Object module related tasks' implementation.
  */
 
-#include <bind/libbind.hh>
-#include <misc/error.hh>
 #include <memory>
 #include <ast/tasks.hh>
 #include <astclone/libastclone.hh>
+#include <bind/libbind.hh>
 #include <common.hh>
+#include <misc/error.hh>
 #include <object/libobject.hh>
 #define DEFINE_TASKS 1
 #include <object/tasks.hh>

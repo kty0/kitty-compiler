@@ -217,7 +217,7 @@ rid              _[a-zA-Z0-9_]*
 
 \\\\ { grown_string += '\\'; }
 
-\\\" { std::cout << "quote\n"; grown_string += '"'; }
+\\\" { grown_string += '"'; }
 
 \\x[0-9a-fA-F]{2} { grown_string += strtol(text() + 2, 0, 16);
   if (errno == ERANGE) {

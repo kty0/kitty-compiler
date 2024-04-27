@@ -1,0 +1,9 @@
+let 
+    var a := 42
+in
+    let 
+        var a := 43
+    in
+        a
+    end
+end

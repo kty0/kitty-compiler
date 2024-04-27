@@ -12,10 +12,8 @@ namespace ast
   void Escapable::escaped_set()
   {
     this->escaped_ = true;
-    this->locked_ = true;
   }
   void Escapable::unescaped_set() { this->escaped_ = false; }
-  bool Escapable::is_locked() const { return this->locked_; }
   bool Escapable::is_escaped() const { return this->escaped_; }
 
   ast::FunctionDec* Escapable::def_site_get() const { return this->def_site_; }

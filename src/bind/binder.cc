@@ -178,6 +178,10 @@ namespace bind
     try
       {
         binding_tuples t = this->sm.get(e.name_get());
+        if (e.init_get() != nullptr)
+          {
+            (*this)(e.init_get());
+          }
         if (GETVAR != nullptr && GET_LAST_CHUNK_VAR == nb_chunks)
           {
             this->error_ << misc::error::error_type::bind << e.location_get()
@@ -204,10 +208,7 @@ namespace bind
       {
         (*this)(e.type_name_get());
       }
-    if (e.init_get() != nullptr)
-      {
-        (*this)(e.init_get());
-      }
+
   }
 
   /*
@@ -219,9 +220,9 @@ namespace bind
 
   void Binder::operator()(ast::ForExp& e)
   {
+    (*this)(e.hi_get());
     this->sm.scope_begin();
     (*this)(e.vardec_get());
-    (*this)(e.hi_get());
     break_stack.push(&e);
     (*this)(e.body_get());
     break_stack.pop();

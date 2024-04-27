@@ -1,0 +1,11 @@
+let
+  function f(x : int) = ()
+in
+  (
+    f(42);
+    let
+    in
+      f(42)
+    end
+  )
+end

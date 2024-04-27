@@ -84,9 +84,9 @@ namespace llvmtranslate
               if (esc->def_site_get() != current_function_)
                 {
                   if (escaped_[function].contains(esc))
-                  {
-                    continue;
-                  }
+                    {
+                      continue;
+                    }
 
                   escaped_[function].insert(esc);
                   did_modify_ = true;

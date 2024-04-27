@@ -26,6 +26,31 @@ check() {
     fi
 }
 
+check_clang() {
+  clang "-m32" "-otest" "/tmp/runtime-result.ll" 1> /dev/null 2> /dev/null
+
+  if [ $? -eq 0 ]; then
+    echo "${GREEN}✓${NC} compilation successful for $file"
+    passed=$(($passed + 1))
+  else
+    echo "${RED}✗${NC} clang issue for $file"
+  fi
+}
+
+check_llvm() {
+    local file="$1"
+
+    counter=$(($counter + 1))
+
+    "$tc" "--llvm-runtime-display" "--llvm-display" $file 1> "/tmp/runtime-result.ll" 2> /dev/null
+
+    if [ $? -eq 0 ]; then
+      check_clang
+    else
+      echo "${RED}✗${NC} computing llvm for $file"
+    fi
+}
+
 for file in $(find "good" -name "*.tig"); do
   check "$file" 0 "--rename -bBeEAT"
 done
@@ -47,7 +72,13 @@ for file in $(find "type" -name "*.tig"); do
 done
 
 for file in $(find "good" -name "*.tig"); do
-  check "$file" 0 "--llvm-display"
+  check_llvm "$file"
 done
 
-echo "» Total: $counter\n» Passed: $passed ($(($passed * 100 / $counter))%)"
+if [ $passed -eq $counter ]; then
+  emote=" °˖✧◝(⁰▿⁰)◜✧˖°"
+else
+  emote=""
+fi
+
+echo "» Passed: $passed ($(($passed * 100 / $counter))%)$emote\n» Total: $counter"

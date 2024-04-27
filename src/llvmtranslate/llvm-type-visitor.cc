@@ -73,9 +73,9 @@ namespace llvmtranslate
         field_types.reserve(e.fields_get().size());
         // FIXED: Some code was deleted here.
         for (type::Field field : e.fields_get())
-        {
+          {
             field_types.push_back(llvm_type(field.type_get()));
-        }
+          }
         structs_[&e]->setBody(std::move(field_types), false);
       }
 

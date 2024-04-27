@@ -1,0 +1,19 @@
+let
+in
+  let
+    var lo := 0
+    var hi := 5
+    var i_19 := lo
+  in
+    if lo <= hi
+      then while 0 do
+        (
+          print_int(42);
+          if i_19 = hi
+            then break
+            else ();
+          i_19 := i_19 + 1
+        )
+      else ()
+  end
+end

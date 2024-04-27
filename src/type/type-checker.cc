@@ -90,8 +90,8 @@ namespace type
     if (!error_)
       {
         // FIXED: Some code was deleted here.
-        const Nil *first = dynamic_cast<const Nil *>(&type1);
-        const Nil *second = dynamic_cast<const Nil *>(&type2);
+        const Nil* first = dynamic_cast<const Nil*>(&type1);
+        const Nil* second = dynamic_cast<const Nil*>(&type2);
 
         if (first != nullptr && second == nullptr)
           {
@@ -144,7 +144,7 @@ namespace type
         return;
       }
 
-    const Type *field_type = record_type->field_type(e.name_get());
+    const Type* field_type = record_type->field_type(e.name_get());
     if (field_type == nullptr)
       {
         error(e, "unknown field");
@@ -229,15 +229,19 @@ namespace type
     // FIXED: Some code was deleted here.
     ast::OpExp::Oper op = e.oper_get();
 
-    if (op == ast::OpExp::Oper::add || op == ast::OpExp::Oper::sub || op == ast::OpExp::Oper::mul || op == ast::OpExp::Oper::div) // Arithmetic operations
+    if (op == ast::OpExp::Oper::add || op == ast::OpExp::Oper::sub
+        || op == ast::OpExp::Oper::mul
+        || op == ast::OpExp::Oper::div) // Arithmetic operations
       {
-        check_types(e, "left operand", *type(e.left_get()), "expected", Int::instance());
-        check_types(e, "right operand", *type(e.right_get()), "expected", Int::instance());
+        check_types(e, "left operand", *type(e.left_get()), "expected",
+                    Int::instance());
+        check_types(e, "right operand", *type(e.right_get()), "expected",
+                    Int::instance());
       }
     else // Comparisons
       {
         check_types(e, "left operand", e.left_get(), "right operand",
-            e.right_get());
+                    e.right_get());
       }
 
     type_default(e, &Int::instance());
@@ -250,7 +254,8 @@ namespace type
     check_types(e, "size clause", *type(e.size_get()), "expected",
                 Int::instance());
 
-    const Array *array_type = dynamic_cast<const Array *>(&type(e.type_name_get())->actual());
+    const Array* array_type =
+      dynamic_cast<const Array*>(&type(e.type_name_get())->actual());
     if (array_type == nullptr)
       {
         error(e, "expected array type");
@@ -280,7 +285,7 @@ namespace type
 
   void TypeChecker::operator()(ast::AssignExp& e)
   {
-    ast::SimpleVar *simplevar = dynamic_cast<ast::SimpleVar *>(&e.var_get());
+    ast::SimpleVar* simplevar = dynamic_cast<ast::SimpleVar*>(&e.var_get());
     if (simplevar && simplevar->def_get()->read_only_get())
       {
         error(e, "variable is read only");
@@ -439,11 +444,11 @@ namespace type
         return;
       }
 
-    const type::Type *exp_type = type(*e.init_get());
+    const type::Type* exp_type = type(*e.init_get());
 
     if (e.type_name_get() == nullptr)
       {
-        if (dynamic_cast<const Nil *>(exp_type))
+        if (dynamic_cast<const Nil*>(exp_type))
           {
             error(e, "assigning nil to untyped var");
           }
@@ -486,7 +491,7 @@ namespace type
   template <> void TypeChecker::visit_dec_body<ast::TypeDec>(ast::TypeDec& e)
   {
     // FIXED: Some code was deleted here.
-    const Named *named_type = dynamic_cast<const Named *>(e.type_get());
+    const Named* named_type = dynamic_cast<const Named*>(e.type_get());
     if (named_type == nullptr)
       {
         error(e, "TypeDec ill-typed somehow");
@@ -514,13 +519,13 @@ namespace type
       }
     for (const auto dec : e)
       {
-        const Named *named_type = dynamic_cast<const Named *>(dec->type_get());
+        const Named* named_type = dynamic_cast<const Named*>(dec->type_get());
         if (named_type != nullptr && !named_type->sound())
-        {
-          error(e, "recursive inheritance");
-          named_type->type_set(&Int::instance());
-          return;
-        }
+          {
+            error(e, "recursive inheritance");
+            named_type->type_set(&Int::instance());
+            return;
+          }
       }
   }
 
@@ -560,7 +565,23 @@ namespace type
   void TypeChecker::operator()(ast::RecordTy& e)
   {
     // FIXED: Some code was deleted here.
-    const Record *record_ptr = type(e.fields_get());
+    std::set<std::string> names;
+
+    for (auto it = e.fields_get().begin(); it != e.fields_get().end(); it++)
+      {
+        if (names.contains((*it)->name_get()))
+          {
+            error(e, "repetitive record");
+            type_default(e, &Int::instance());
+            return;
+          }
+        else
+          {
+            names.insert((*it)->name_get().get());
+          }
+      }
+
+    const Record* record_ptr = type(e.fields_get());
 
     type_default(e, record_ptr);
     created_type_default(e, record_ptr);

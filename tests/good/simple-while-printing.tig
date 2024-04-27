@@ -1,0 +1,13 @@
+let
+  var str1 := "Rosélia\n"
+  var str2 := "Sulfura\n"
+  var n := 0
+in
+  while n < 5 do
+  (
+    if n = 0
+      then print(str1)
+      else print(str2);
+    n := n + 1
+  )
+end

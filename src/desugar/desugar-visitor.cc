@@ -27,8 +27,8 @@ namespace desugar
     // FIXED: Some code was deleted here.
     if (!desugar_string_cmp_p_)
       {
-          super_type::operator()(e);
-          return;
+        super_type::operator()(e);
+        return;
       }
 
     if (*e.left_get().type_get() != type::String::instance()
@@ -51,9 +51,9 @@ namespace desugar
         result_ = res;
       }
     else if (e.oper_get() == ast::OpExp::Oper::le
-        || e.oper_get() == ast::OpExp::Oper::lt
-        || e.oper_get() == ast::OpExp::Oper::ge
-        || e.oper_get() == ast::OpExp::Oper::gt)
+             || e.oper_get() == ast::OpExp::Oper::lt
+             || e.oper_get() == ast::OpExp::Oper::ge
+             || e.oper_get() == ast::OpExp::Oper::gt)
       {
         const auto& left = recurse(e.left_get());
         const auto& right = recurse(e.right_get());
@@ -78,8 +78,8 @@ namespace desugar
 
         parse::Tweast tweast;
 
-        tweast << "strcmp(" << left << ", " << right << ") "
-               << comparator << " 0";
+        tweast << "strcmp(" << left << ", " << right << ") " << comparator
+               << " 0";
 
         ast::Exp* res = parse::parse(tweast);
         result_ = res;
@@ -137,18 +137,20 @@ namespace desugar
       {
         super_type::operator()(e);
       }
-    else {
-        const auto &hi = recurse(e.hi_get());
-        const auto &body = recurse(e.body_get());
-        const auto &exp = recurse(e.vardec_get());
+    else
+      {
+        const auto& hi = recurse(e.hi_get());
+        const auto& body = recurse(e.body_get());
+        const auto& exp = recurse(e.vardec_get());
         auto name = e.vardec_get().name_get();
         const auto intexp = dynamic_cast<const ast::IntExp*>(exp->init_get());
 
         parse::Tweast tweast;
 
         tweast << "let" << '\n'
-               << "var _lo := " << intexp->value_get() << '\n' << "var _hi := " << *hi << '\n' << "var "
-               << e.vardec_get().name_get() << " := _lo" << '\n'
+               << "var _lo := " << intexp->value_get() << '\n'
+               << "var _hi := " << *hi << '\n'
+               << "var " << e.vardec_get().name_get() << " := _lo" << '\n'
                << "in" << '\n'
                << "if _lo <= _hi then" << '\n'
                << "while 1 do" << '\n'
@@ -158,8 +160,8 @@ namespace desugar
                << ")" << '\n'
                << "end" << '\n';
 
-        ast::Exp *res = parse::parse(tweast);
+        ast::Exp* res = parse::parse(tweast);
         result_ = res;
-    }
+      }
   }
 } // namespace desugar

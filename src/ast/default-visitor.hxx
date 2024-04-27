@@ -198,12 +198,12 @@ namespace ast
   void GenDefaultVisitor<Const>::operator()(const_t<VarDec>& e)
   {
     // `type_name' might be omitted.
-    if(e.type_name_get() != nullptr)
+    if (e.type_name_get() != nullptr)
       {
         this->accept(e.type_name_get());
       }
     // `init' can be null in case of formal parameter.
-    if(e.init_get() != nullptr)
+    if (e.init_get() != nullptr)
       {
         this->accept(e.init_get());
       }

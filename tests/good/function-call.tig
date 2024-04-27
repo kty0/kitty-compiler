@@ -1,0 +1,9 @@
+let
+  var x := 42
+  function f(a : int, b : string) : string = "Doduo"
+in
+  (
+    f(x, "Hypotrempe");
+    f(x, "Hypotrempe")
+  )
+end

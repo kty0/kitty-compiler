@@ -1,0 +1,8 @@
+let
+  var x := 42
+  function f() : int = x
+in
+  if 1 & x | f() | (1 = 1) = 1
+    then print_int(x)
+    else ()
+end

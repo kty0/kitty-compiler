@@ -272,8 +272,8 @@ namespace ast
                 ostr_ << "/* escaping */ ";
               }
             ostr_ << (*formals.begin())->name_get() << " /* "
-                  << (*formals.begin()) << " */" << " : "
-                  << *(*formals.begin())->type_name_get();
+                  << (*formals.begin()) << " */"
+                  << " : " << *(*formals.begin())->type_name_get();
             for (auto it = formals.begin() + 1; it != formals.end(); it++)
               {
                 ostr_ << ", ";
@@ -300,8 +300,7 @@ namespace ast
                   {
                     ostr_ << "/* escaping */ ";
                   }
-                ostr_ << (*it)->name_get() << " : "
-                      << *(*it)->type_name_get();
+                ostr_ << (*it)->name_get() << " : " << *(*it)->type_name_get();
               }
           }
       }
@@ -393,7 +392,8 @@ namespace ast
   /* a + b */
   void PrettyPrinter::operator()(const ast::OpExp& e)
   {
-    ostr_ << e.left_get() << " " << str(e.oper_get()) << " " << e.right_get();
+    ostr_ << "(" << e.left_get() << " " << str(e.oper_get()) << " "
+          << e.right_get() << ")";
   }
 
   /* node { a = 42, b = "oui" } */

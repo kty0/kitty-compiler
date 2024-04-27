@@ -1,0 +1,4 @@
+let
+  function rec() = rec()
+in
+end

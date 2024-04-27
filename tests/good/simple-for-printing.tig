@@ -1,0 +1,7 @@
+let
+  type text = string
+  var str : text := "Roussil"
+in
+  for i := 0 to 5 do
+    print(str)
+end

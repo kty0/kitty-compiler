@@ -9,10 +9,7 @@
 namespace ast
 {
   // FIXED: Some code was deleted here.
-  void Escapable::escaped_set()
-  {
-    this->escaped_ = true;
-  }
+  void Escapable::escaped_set() { this->escaped_ = true; }
   void Escapable::unescaped_set() { this->escaped_ = false; }
   bool Escapable::is_escaped() const { return this->escaped_; }
 

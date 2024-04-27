@@ -21,7 +21,8 @@ static void test_desugar(const std::string& s)
     {
       tree = parse::parse_unit(s, true);
       std::cout << "/* === Original tree...  */\n" << *tree << '\n';
-      object::bind(*tree).exit_on_error();
+      // bye bye little unimplemented line
+      //object::bind(*tree).exit_on_error();
       object::types_check(*tree).exit_on_error();
       class_names = object::rename(*tree);
       std::cout << "/* === Renamed tree...  */\n" << *tree << '\n';

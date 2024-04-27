@@ -28,7 +28,8 @@ namespace inlining
 
     /// \name Visit methods.
     /// \{
-    // FIXME: Some code was deleted here.
+    // FIXED: Some code was deleted here.
+    void operator()(const ast::CallExp&) override;
     /// \}
 
     /// \name Getters.
